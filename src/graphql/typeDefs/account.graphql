@@ -1,5 +1,12 @@
+type ResponseMPIN {
+  success: Boolean
+  message: String
+}
+
+# Main
 type Query {
-  _empty: String!
+  sendMPIN(phone: String): ResponseMPIN
+  verifyMPIN(phone: String, code: String): ResponseMPIN
 }
 
 type Mutation {

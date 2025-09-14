@@ -33,6 +33,7 @@
     "nodemon": "^3.1.10",
     "prisma": "^6.16.1",
     "ts-node": "^10.9.2",
+    "twilio": "^5.9.0",
     "typescript": "^5.9.2"
   }
 }
