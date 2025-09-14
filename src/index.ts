@@ -25,7 +25,11 @@ const server = new ApolloServer({
 const startServer = async () => {
   await server.start();
 
-  app.use(cors());
+  app.use(
+    cors({
+      origin: "*",
+    })
+  );
   app.use(express.json());
 
   app.use(
@@ -44,6 +48,21 @@ const startServer = async () => {
       },
     })
   );
+
+  // Create token for testing ONLY | delete THIS in production
+  // This is for queries like graphql playground Authorization header
+  app.post("/createToken", (req, res) => {
+    const temp = {
+      sample: "sample",
+    };
+
+    try {
+      const token = jwt.sign(temp, JWT_SECRET);
+      res.send(token);
+    } catch (err) {
+      res.status(500).send(err);
+    }
+  });
 
   app.listen(PORT, () => {
     console.log(
