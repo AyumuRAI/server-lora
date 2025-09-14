@@ -35,3 +35,11 @@ npm run prisma:generate
 ```
 npm run prisma:migrate
 ```
+
+# ALSO ADD THIS FOR TWILIO SID, AUTH KEY IN .env
+
+```
+TWILIO_ACCOUNT_SID="<your-account-sid>"
+TWILIO_AUTH_TOKEN="<your-auth-token>"
+TWILIO_SERVICE_SID="<your-service-id>"
+```
