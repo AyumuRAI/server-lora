@@ -5,7 +5,7 @@ import jwt from "jsonwebtoken";
 
 // Prisma, Apollo, GraphQL
 import { ApolloServer } from "@apollo/server";
-import { typeDefs, resolvers } from "./graphql/modules.ts";
+import { typeDefs, resolvers } from "./graphql/modules";
 import { expressMiddleware } from "@as-integrations/express5"; // Using Apollo with Express
 import { PrismaClient } from "@prisma/client";
 
