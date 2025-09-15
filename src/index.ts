@@ -9,12 +9,16 @@ import { typeDefs, resolvers } from "./graphql/modules";
 import { expressMiddleware } from "@as-integrations/express5"; // Using Apollo with Express
 import { PrismaClient } from "@prisma/client";
 
+// Libraries
+import { Context } from "./lib/context";
+
 dotenv.config();
 
 const JWT_SECRET = process.env.JWT_SECRET!;
 const PORT = process.env.PORT || 5000;
 
 const app = express();
+const prisma = new PrismaClient();
 
 const server = new ApolloServer({
   typeDefs,
@@ -35,15 +39,16 @@ const startServer = async () => {
   app.use(
     "/graphql",
     expressMiddleware(server, {
-      context: async ({ req }) => {
+      context: async ({ req }): Promise<Context> => {
         const token = req.headers.authorization || "";
+        let user = null;
 
         try {
-          jwt.verify(token, JWT_SECRET);
+          user = jwt.verify(token, JWT_SECRET);
 
-          return new PrismaClient();
+          return { user, prisma };
         } catch (err) {
-          throw err;
+          return { user, prisma };
         }
       },
     })
