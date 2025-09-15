@@ -1,10 +1,8 @@
-import { PrismaClient } from "@prisma/client";
+import { Context } from "@lib/context";
 import dotenv from "dotenv";
 import twilio from "twilio";
 
 dotenv.config();
-
-const prisma = new PrismaClient();
 
 // TWILIO
 const accountSid = process.env.TWILIO_ACCOUNT_SID;
