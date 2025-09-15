@@ -1,6 +1,4 @@
-import { PrismaClient } from "@prisma/client";
-
-const prisma = new PrismaClient();
+import { Context } from "@lib/context";
 
 export const resolvers = {
   Query: {
