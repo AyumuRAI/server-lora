@@ -14,9 +14,27 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum Gender {
+  MALE
+  FEMALE
+  OTHERS
+}
+
 model Account {
   id String @id @default(uuid())
   phone String @unique
-  password String
+  fname String
+  mname String?
+  lname String
+  suffix String?
+  birthdate DateTime
+  gender Gender?
+  nationality String?
+  country String
+  province String
+  municipality String
+  barangay String
+  address_text String
+  pinCode String
   createdAt DateTime @default(now())
 }
