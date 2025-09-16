@@ -14,12 +14,15 @@ export const resolvers = {
   Query: {
     sendMPIN: async (_: any, args: { phone: string }) => {
       try {
-        const verification = await client.verify.v2
-          .services(serviceSID)
-          .verifications.create({
-            to: args.phone,
-            channel: "sms",
-          });
+        // const verification = await client.verify.v2
+        //   .services(serviceSID)
+        //   .verifications.create({
+        //     to: args.phone,
+        //     channel: "sms",
+        //   });
+
+        // TO DO: This is temporary to prevent spam during development
+        const verification = { status: "pending" }
 
         return {
           success: verification.status === "pending",
@@ -34,12 +37,15 @@ export const resolvers = {
     },
     verifyMPIN: async (_: any, args: { phone: string; code: string }) => {
       try {
-        const verification = await client.verify.v2
-          .services(serviceSID)
-          .verificationChecks.create({
-            to: args.phone,
-            code: args.code,
-          });
+        // const verification = await client.verify.v2
+        //   .services(serviceSID)
+        //   .verificationChecks.create({
+        //     to: args.phone,
+        //     code: args.code,
+        //   });
+
+        // TO DO: This is temporary to prevent spam during development
+        const verification = { status: "approved" }
 
         return {
           success: verification.status === "approved",
