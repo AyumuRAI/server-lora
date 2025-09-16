@@ -25,6 +25,11 @@ type ResponseAccount {
   message: String
 }
 
+type ResponseLogin {
+  success: Boolean
+  message: String
+}
+
 # Main
 type Query {
   sendMPIN(phone: String): ResponseMPIN
@@ -33,4 +38,5 @@ type Query {
 
 type Mutation {
   createAccount(data: CreateAccountInput): ResponseAccount
+  loginAccount(phone: String, pinCode: String): ResponseLogin
 }
