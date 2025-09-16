@@ -13,8 +13,21 @@ const client = twilio(accountSid, authToken);
 
 export const resolvers = {
   Query: {
-    sendMPIN: async (_: any, args: { phone: string }) => {
+    sendMPIN: async (_: any, args: { phone: string }, context: Context) => {
       try {
+        const isExist = await context.prisma.account.findUnique({
+          where: {
+            phone: args.phone,
+          },
+        })
+
+        if (isExist) {
+          return {
+            success: false,
+            message: "Account already exist",
+          };
+        }
+
         // const verification = await client.verify.v2
         //   .services(serviceSID)
         //   .verifications.create({
