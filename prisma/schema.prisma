@@ -29,7 +29,7 @@ model Account {
   suffix String?
   birthdate DateTime
   gender Gender?
-  nationality String
+  nationality String?
   country String
   province String
   municipality String

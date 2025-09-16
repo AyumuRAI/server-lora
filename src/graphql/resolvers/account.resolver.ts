@@ -1,4 +1,5 @@
 import { Context } from "@lib/context";
+import { CreateAccountData } from "@lib/types";
 import dotenv from "dotenv";
 import twilio from "twilio";
 
@@ -60,6 +61,22 @@ export const resolvers = {
     },
   },
   Mutation: {
-    _empty: () => "",
+    createAccount: async (_: any, args: { data: CreateAccountData }, context: Context) => {
+      try {
+        await context.prisma.account.create({
+          data:  {...args.data }
+        })
+
+        return {
+          success: true,
+          message: "Account created successfully",
+        };
+      } catch (err: any) {
+        return {
+          success: false,
+          message: err.message,
+        }
+      }
+    },
   },
 };
