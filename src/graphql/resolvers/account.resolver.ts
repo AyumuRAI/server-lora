@@ -91,5 +91,38 @@ export const resolvers = {
         }
       }
     },
+    loginAccount: async (_: any, args: { phone: string, pinCode: string }, context: Context ) => {
+      try {
+        const account = await context.prisma.account.findUnique({
+          where: {
+            phone: args.phone
+          }
+        })
+
+        if (!account) {
+          return {
+            success: false,
+            message: "Account not found",
+          };
+        }
+
+        if (account.pinCode !== args.pinCode) {
+          return {
+            success: false,
+            message: "Invalid PIN",
+          };
+        }
+
+        return {
+          success: true,
+          message: "Login successful",
+        };
+      } catch (err: any) {
+        return {
+          success: false,
+          message: err.message,
+        }
+      }
+    }
   },
 };
