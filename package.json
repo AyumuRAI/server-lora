@@ -5,9 +5,10 @@
   "main": "index.ts",
   "scripts": {
     "dev": "nodemon --exec ts-node src/index.ts",
-    "create:postgres": "docker run --name server-lora -e POSTGRES_USER=admin -e POSTGRES_PASSWORD=admin123 -e POSTGRES_DB=lora -p 5433:5432 -d postgres",
+    "start:postgres": "docker-compose up -d",
+    "stop:postgres": "docker-compose down",
     "prisma:generate": "npx prisma generate",
-    "prisma:migrate": "npx prisma migrate dev --name init"
+    "prisma:migrate": "npx prisma migrate dev --name"
   },
   "keywords": [],
   "author": "",

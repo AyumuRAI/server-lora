@@ -18,10 +18,10 @@ git checkout develop
 npm install
 ```
 
-3. Create a postgres database with docker _(MAKE SURE TO INSTALL DOCKER FIRST IN YOUR SYSTEM)_
+3. Start the postgres database (MAKE SURE DOCKER IS INSTALLED IN YOUR SYSTEM)
 
 ```
-npm run create:postgres
+npm run start:postgres
 ```
 
 4. Generate prisma
@@ -31,9 +31,13 @@ npm run prisma:generate
 ```
 
 5. Migrate prisma
+*Example: npm run prisma:migrate -- init*
+<br>
+*(Note: Once you have used a migration name, you cannot use the same name again. Each migration must have a unique name. Example: --name second.)*
+<br>
 
 ```
-npm run prisma:migrate
+npm run prisma:migrate -- <name_your_migrate>
 ```
 
 # ALSO ADD THIS FOR TWILIO SID, AUTH KEY IN .env
@@ -42,4 +46,21 @@ npm run prisma:migrate
 TWILIO_ACCOUNT_SID="<your-account-sid>"
 TWILIO_AUTH_TOKEN="<your-auth-token>"
 TWILIO_SERVICE_SID="<your-service-id>"
+```
+
+# EXTRAS
+1. To stop postgres database server
+```
+npm run stop:postgres
+```
+
+2. To delete the entire postgres database
+```
+docker-compose down -v
+```
+
+3. If you update the schema.prisma, you must run prisma generate and prisma migrate again.
+```
+npm run prisma:generate
+npm run prisma:migrate -- <name_your_migrate>
 ```
