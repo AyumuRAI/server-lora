@@ -32,7 +32,6 @@ npm run prisma:generate
 
 5. Migrate prisma
 *Example: npm run prisma:migrate -- init*
-<br>
 *(Note: Once you have used a migration name, you cannot use the same name again. Each migration must have a unique name. Example: --name second.)*
 <br>
 
