@@ -18,7 +18,23 @@ const JWT_SECRET = process.env.JWT_SECRET!;
 const PORT = process.env.PORT || 5000;
 
 const app = express();
-const prisma = new PrismaClient();
+// Main Database for write
+const prisma = new PrismaClient({
+  datasources: {
+    db: {
+      url: process.env.DATABASE_URL,
+  }
+}
+});
+
+// Replica Database for read-only
+const prismaReplica = new PrismaClient({
+  datasources: {
+    db: {
+      url: process.env.DATABASE_URL_REPLICA,
+  }
+}
+});
 
 const server = new ApolloServer({
   typeDefs,
@@ -46,9 +62,9 @@ const startServer = async () => {
         try {
           user = jwt.verify(token, JWT_SECRET);
 
-          return { user, prisma };
+          return { user, prisma, prismaReplica };
         } catch (err) {
-          return { user, prisma };
+          return { user, prisma, prismaReplica };
         }
       },
     })
