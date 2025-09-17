@@ -1,0 +1,39 @@
+services:
+  postgres-primary:
+    image: postgres:15
+    container_name: server-lora
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin123
+      POSTGRES_DB: lora
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres-primary-data:/var/lib/postgresql/data
+    networks:
+      - lora-net
+
+  postgres-replica:
+    image: postgres:15
+    container_name: server-lora-replica
+    depends_on:
+      - postgres-primary
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin123
+      POSTGRES_DB: lora
+    ports:
+      - "5434:5432"
+    volumes:
+      - postgres-replica-data:/var/lib/postgresql/data
+    command: >
+      postgres -c hot_standby=on -c primary_conninfo="host=postgres-primary port=5432 user=admin password=admin123"
+    networks:
+      - lora-net
+
+volumes:
+  postgres-primary-data:
+  postgres-replica-data:
+
+networks:
+  lora-net:
