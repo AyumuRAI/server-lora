@@ -20,21 +20,30 @@ enum Gender {
   OTHERS
 }
 
+enum Role {
+  ADMIN
+  AGENT
+  USER
+}
+
 model Account {
   id String @id @default(uuid())
-  phone String @unique
+  phone String? @unique
   fname String
   mname String?
   lname String
   suffix String?
-  birthdate DateTime
+  birthdate DateTime?
   gender Gender?
   nationality String?
-  country String
-  province String
-  municipality String
-  barangay String
-  address_text String
-  pinCode String
+  country String?
+  province String?
+  municipality String?
+  barangay String?
+  address_text String?
+  pinCode String?
+  email String? @unique
+  password String?
+  role Role @default(USER)
   createdAt DateTime @default(now())
 }
