@@ -10,6 +10,7 @@ services:
       - "5433:5432"
     volumes:
       - postgres-primary-data:/var/lib/postgresql/data
+      - ./docker-scripts/primary-init/01-setup-primary.sh:/docker-entrypoint-initdb.d/01-setup-primary.sh
     networks:
       - lora-net
 
@@ -25,9 +26,8 @@ services:
     ports:
       - "5434:5432"
     volumes:
+      - ./docker-scripts/replica-init/01-setup-replica.sh:/docker-entrypoint-initdb.d/01-setup-replica.sh
       - postgres-replica-data:/var/lib/postgresql/data
-    command: >
-      postgres -c hot_standby=on -c primary_conninfo="host=postgres-primary port=5432 user=admin password=admin123"
     networks:
       - lora-net
 
