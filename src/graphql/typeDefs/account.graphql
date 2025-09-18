@@ -23,11 +23,7 @@ input CreateAccountInput {
 type ResponseAccount {
   success: Boolean
   message: String
-}
-
-type ResponseLogin {
-  success: Boolean
-  message: String
+  token: String
 }
 
 # Main
@@ -38,5 +34,5 @@ type Query {
 
 type Mutation {
   createAccount(data: CreateAccountInput): ResponseAccount
-  loginAccount(phone: String, pinCode: String): ResponseLogin
+  loginAccount(phone: String, pinCode: String): ResponseAccount
 }

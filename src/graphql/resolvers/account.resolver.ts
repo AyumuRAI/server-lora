@@ -2,6 +2,7 @@ import { Context } from "@lib/context";
 import { CreateAccountData } from "@lib/types";
 import dotenv from "dotenv";
 import twilio from "twilio";
+import { createToken } from "@actions/clientAccountToken";
 
 dotenv.config();
 
@@ -15,7 +16,7 @@ export const resolvers = {
   Query: {
     sendMPIN: async (_: any, args: { phone: string }, context: Context) => {
       try {
-        const isExist = await context.prisma.account.findUnique({
+        const isExist = await context.prismaReplica.account.findUnique({
           where: {
             phone: args.phone,
           },
@@ -76,13 +77,19 @@ export const resolvers = {
   Mutation: {
     createAccount: async (_: any, args: { data: CreateAccountData }, context: Context) => {
       try {
-        await context.prisma.account.create({
+        const account = await context.prisma.account.create({
           data:  {...args.data }
+        })
+
+        const token = createToken({
+          id: account.id,
+          role: account.role
         })
 
         return {
           success: true,
           message: "Account created successfully",
+          token
         };
       } catch (err: any) {
         return {
@@ -91,9 +98,17 @@ export const resolvers = {
         }
       }
     },
-    loginAccount: async (_: any, args: { phone: string, pinCode: string }, context: Context ) => {
+    loginAccount: async (_: any, args: { phone?: string, pinCode?: string }, context: Context ) => {
       try {
-        const account = await context.prisma.account.findUnique({
+        // Is token exist and valid
+        if (context.user) {
+          return {
+            success: true,
+            message: "Login successful",
+          };
+        }
+
+        const account = await context.prismaReplica.account.findUnique({
           where: {
             phone: args.phone
           }
@@ -113,9 +128,15 @@ export const resolvers = {
           };
         }
 
+        const token = createToken({
+          id: account.id,
+          role: account.role
+        })
+
         return {
           success: true,
           message: "Login successful",
+          token
         };
       } catch (err: any) {
         return {
