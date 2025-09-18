@@ -16,7 +16,7 @@ export const resolvers = {
   Query: {
     sendMPIN: async (_: any, args: { phone: string }, context: Context) => {
       try {
-        const isExist = await context.prisma.account.findUnique({
+        const isExist = await context.prismaReplica.account.findUnique({
           where: {
             phone: args.phone,
           },
