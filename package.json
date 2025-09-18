@@ -5,7 +5,7 @@
   "main": "index.ts",
   "scripts": {
     "dev": "nodemon --exec ts-node -r tsconfig-paths/register src/index.ts",
-    "start:postgres": "docker-compose up -d",
+    "start:postgres": "shx chmod +x docker-scripts/start.sh && docker-scripts/start.sh",
     "stop:postgres": "docker-compose down",
     "prisma:generate": "npx prisma generate",
     "prisma:migrate": "npx prisma migrate dev --name"
@@ -37,5 +37,8 @@
     "tsconfig-paths": "^4.2.0",
     "twilio": "^5.9.0",
     "typescript": "^5.9.2"
+  },
+  "devDependencies": {
+    "shx": "^0.4.0"
   }
 }
