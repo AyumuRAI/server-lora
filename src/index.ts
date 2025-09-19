@@ -1,7 +1,7 @@
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
-import jwt from "jsonwebtoken";
+import jwt, { JwtPayload } from "jsonwebtoken";
 
 // Prisma, Apollo, GraphQL
 import { ApolloServer } from "@apollo/server";
@@ -60,7 +60,7 @@ const startServer = async () => {
         let user = null;
 
         try {
-          user = jwt.verify(token, JWT_SECRET);
+          user = jwt.verify(token, JWT_SECRET) as JwtPayload;
 
           return { user, prisma, prismaReplica };
         } catch (err) {

@@ -2,7 +2,7 @@ import { Context } from "@lib/context";
 import { CreateAccountData } from "@lib/types";
 import dotenv from "dotenv";
 import twilio from "twilio";
-import { createToken } from "@actions/clientAccountToken";
+import { createToken, createTokenPhone } from "@actions/clientAccountToken";
 
 dotenv.config();
 
@@ -58,13 +58,17 @@ export const resolvers = {
         //     to: args.phone,
         //     code: args.code,
         //   });
-
+        
         // TO DO: This is temporary to prevent spam during development
         const verification = { status: "approved" }
 
+        // Create a token specific to phone number to save in client's cookies
+        const token = createTokenPhone({ phone: args.phone });
+
         return {
-          success: verification.status === "approved",
+          success: true,
           message: "MPIN verified successfully",
+          token
         };
       } catch (err: any) {
         return {
@@ -73,6 +77,23 @@ export const resolvers = {
         };
       }
     },
+    extractPhoneFromToken: async(_:any, args: {}, context: Context) => {
+      let token = context.user
+
+      if (token && typeof token === "object") {
+
+        return {
+          success: true,
+          message: "Token decoded successfully",
+          phone: token.phone
+        }
+      }
+
+      return {
+        success: false,
+        message: "Invalid token"
+      }
+    }
   },
   Mutation: {
     createAccount: async (_: any, args: { data: CreateAccountData }, context: Context) => {
