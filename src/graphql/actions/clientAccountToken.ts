@@ -19,4 +19,18 @@ const createToken = (args: { id: string, role: string }): string => {
   }
 };
 
-export { createToken };
+const createTokenPhone = (args: { phone: string }): string => {
+  try {
+    const token = jwt.sign(args, JWT_SECRET, {
+      expiresIn: "30d"
+    });
+
+    return token;
+
+  } catch (err: any) {
+    console.log(err.message);
+    throw err
+  }
+};
+
+export { createToken, createTokenPhone };

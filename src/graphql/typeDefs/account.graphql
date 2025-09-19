@@ -1,6 +1,7 @@
 type ResponseMPIN {
   success: Boolean
   message: String
+  token: String
 }
 
 input CreateAccountInput {
@@ -26,10 +27,17 @@ type ResponseAccount {
   token: String
 }
 
+type ResponsePhoneToken {
+  success: Boolean
+  message: String
+  phone: String
+}
+
 # Main
 type Query {
   sendMPIN(phone: String): ResponseMPIN
   verifyMPIN(phone: String, code: String): ResponseMPIN
+  extractPhoneFromToken: ResponsePhoneToken
 }
 
 type Mutation {
