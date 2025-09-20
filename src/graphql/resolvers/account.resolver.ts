@@ -96,6 +96,7 @@ export const resolvers = {
     }
   },
   Mutation: {
+    // Create account for mobile clients
     createAccount: async (_: any, args: { data: CreateAccountData }, context: Context) => {
       try {
         const account = await context.prisma.account.create({
@@ -119,6 +120,7 @@ export const resolvers = {
         }
       }
     },
+    // Login account for mobile clients
     loginAccount: async (_: any, args: { phone?: string, pinCode?: string }, context: Context ) => {
       try {
         // Is token exist and valid
@@ -163,6 +165,56 @@ export const resolvers = {
         return {
           success: false,
           message: err.message,
+        }
+      }
+    },
+    loginAccountWeb: async (_:any, args: { email?: string, password?: string }, context: Context) => {
+      try {
+        // Is token exist and valid
+        if (context.user) {
+          return {
+            success: true,
+            message: "Login successful",
+          };
+        }
+
+        const account = await context.prismaReplica.account.findUnique({
+          where: {
+            email: args.email
+          }
+        })
+
+        if (!account) {
+          return {
+            success: false,
+            message: "Account not found",
+          };
+        }
+
+        // Check password
+        // TO DO: Use bcrypt
+        if (account.password !== args.password) {
+          return {
+            success: false,
+            message: "Invalid password",
+          };
+        }
+
+        const token = createToken({
+          id: account.id,
+          role: account.role
+        })
+
+        return {
+          success: true,
+          message: "Login successful",
+          token
+        }
+
+      } catch (err: any) {
+        return {
+          success: false,
+          message: err.message
         }
       }
     }
