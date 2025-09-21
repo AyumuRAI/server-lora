@@ -17,4 +17,11 @@ type CreateAccountData = {
   pinCode: string;
 };
 
-export { CreateAccountData };
+type CreateAccountDataAdmin = {
+  fname: string;
+  lname: string;
+  email: string;
+  password: string;
+}
+
+export { CreateAccountData, CreateAccountDataAdmin };

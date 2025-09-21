@@ -21,6 +21,13 @@ input CreateAccountInput {
   pinCode: String
 }
 
+input CreateAccountAdminInput {
+  fname: String
+  lname: String
+  email: String
+  password: String
+}
+
 type ResponseAccount {
   success: Boolean
   message: String
@@ -42,6 +49,7 @@ type Query {
 
 type Mutation {
   createAccount(data: CreateAccountInput): ResponseAccount
+  createAccountWeb(data: CreateAccountAdminInput): ResponseAccount
   loginAccount(phone: String, pinCode: String): ResponseAccount
   loginAccountWeb(email: String, password: String): ResponseAccount
 }

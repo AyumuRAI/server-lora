@@ -1,5 +1,5 @@
 import { Context } from "@lib/context";
-import { CreateAccountData } from "@lib/types";
+import { CreateAccountData, CreateAccountDataAdmin } from "@lib/types";
 import dotenv from "dotenv";
 import twilio from "twilio";
 import { createToken, createTokenPhone } from "@actions/clientAccountToken";
@@ -165,6 +165,29 @@ export const resolvers = {
         return {
           success: false,
           message: err.message,
+        }
+      }
+    },
+    createAccountWeb: async (_:any, args: { data: CreateAccountDataAdmin }, context: Context) => {
+      try {
+        const account = await context.prisma.account.create({
+          data:  {...args.data }
+        })
+
+        const token = createToken({
+          id: account.id,
+          role: account.role
+        })
+
+        return {
+          success: true,
+          message: "Account created successfully",
+          token
+        };
+      } catch (err: any) {
+        return {
+          success: false,
+          message: err.message
         }
       }
     },
