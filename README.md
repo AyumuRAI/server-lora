@@ -50,7 +50,7 @@ DATABASE_URL="postgres://admin:admin123@localhost:5433/lora"
 DATABASE_URL_REPLICA="postgres://admin:admin123@localhost:5434/lora"
 ```
 
-# ALSO ADD THIS FOR TWILIO SID, AUTH KEY IN .env
+**ALSO ADD THIS FOR TWILIO SID, AUTH KEY IN .env**
 
 ```
 TWILIO_ACCOUNT_SID="<your-account-sid>"
@@ -58,7 +58,7 @@ TWILIO_AUTH_TOKEN="<your-auth-token>"
 TWILIO_SERVICE_SID="<your-service-id>"
 ```
 
-# ALSO ADD THIS FOR oAUTH(GOOGLE, FACEBOOK) IN .env
+**ALSO ADD THIS FOR oAUTH(GOOGLE, FACEBOOK) IN .env**
 ```
 GOOGLE_CLIENT_ID="<your-google-client-id>"
 GOOGLE_CLIENT_SECRET="<your-google-secret-id>"
