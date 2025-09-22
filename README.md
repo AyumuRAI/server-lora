@@ -1,8 +1,6 @@
 # READ ME
 
 **NOTE: Always make a new branch for changes then create a pull request**
-<br>
-**NOTE: Do not forget to ask for .env file before performing the commands below**
 
 # SERVER INITIAL SETUP
 
@@ -40,6 +38,16 @@ npm run prisma:generate
 
 ```
 npm run prisma:migrate -- <name_your_migrate>
+```
+
+# CONTENTS IN .env
+```
+CLIENT_URL="client-url" # <Example: http://localhost:3000>
+
+JWT_SECRET="<create-your-own-secret>"
+
+DATABASE_URL="postgres://admin:admin123@localhost:5433/lora"
+DATABASE_URL_REPLICA="postgres://admin:admin123@localhost:5434/lora"
 ```
 
 # ALSO ADD THIS FOR TWILIO SID, AUTH KEY IN .env
