@@ -22,6 +22,7 @@ type CreateAccountDataAdmin = {
   lname: string;
   email: string;
   password: string;
+  role: "ADMIN" | "AGENT" | "USER";
 }
 
 export { CreateAccountData, CreateAccountDataAdmin };

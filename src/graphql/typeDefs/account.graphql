@@ -1,3 +1,9 @@
+enum Roles {
+  ADMIN
+  AGENT
+  USER
+}
+
 type ResponseMPIN {
   success: Boolean
   message: String
@@ -26,6 +32,7 @@ input CreateAccountAdminInput {
   lname: String
   email: String
   password: String
+  role: Roles
 }
 
 type ResponseAccount {
