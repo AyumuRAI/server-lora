@@ -50,6 +50,15 @@ TWILIO_AUTH_TOKEN="<your-auth-token>"
 TWILIO_SERVICE_SID="<your-service-id>"
 ```
 
+# ALSO ADD THIS FOR oAUTH(GOOGLE, FACEBOOK) IN .env
+```
+GOOGLE_CLIENT_ID="<your-google-client-id>"
+GOOGLE_CLIENT_SECRET="<your-google-secret-id>"
+
+FACEBOOK_CLIENT_ID="<your-facebook-client-id>"
+FACEBOOK_CLIENT_SECRET="<your-facebook-secret-id>"
+```
+
 # EXTRAS
 1. To stop postgres database server
 ```

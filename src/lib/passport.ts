@@ -5,8 +5,8 @@ import { Strategy as FacebookStrategy } from "passport-facebook";
 const configurePassport = async () => {
   passport.use(
     new GoogleStrategy({
-      clientID: process.env.GOOGLE_CLIENT_ID!,
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+      clientID: process.env.GOOGLE_CLIENT_ID || " ",
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET || " ",
       callbackURL: process.env.BACKEND_URL + "/auth/google/callback"
     },
 
@@ -19,8 +19,8 @@ const configurePassport = async () => {
   // TO DO: Add Facebook oAuth
   // passport.use(
   //   new FacebookStrategy({
-  //     clientID: process.env.FACEBOOK_CLIENT_ID!,
-  //     clientSecret: process.env.FACEBOOK_CLIENT_SECRET!,
+  //     clientID: process.env.FACEBOOK_CLIENT_ID || " ",
+  //     clientSecret: process.env.FACEBOOK_CLIENT_SECRET || " ",
   //     callbackURL: process.env.BACKEND_URL + "/auth/facebook/callback",
   //     profileFields: ["id", "displayName", "emails", "picture.type(large)"],
   //   },
