@@ -1,40 +1,29 @@
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
-import jwt, { JwtPayload } from "jsonwebtoken";
+import passport from "passport";
+import jwt from "jsonwebtoken";
 
 // Prisma, Apollo, GraphQL
 import { ApolloServer } from "@apollo/server";
 import { typeDefs, resolvers } from "./graphql/modules";
 import { expressMiddleware } from "@as-integrations/express5"; // Using Apollo with Express
-import { PrismaClient } from "@prisma/client";
 
 // Libraries
 import { Context } from "./lib/context";
+import { configurePassport } from "./lib/passport";
+
+// Routes
+import OAuthRoute from "./routes/oauth";
+
+// Middlewares
+import { contextMiddleware } from "@lib/middleware"
 
 dotenv.config();
 
-const JWT_SECRET = process.env.JWT_SECRET!;
 const PORT = process.env.PORT || 5000;
 
 const app = express();
-// Main Database for write
-const prisma = new PrismaClient({
-  datasources: {
-    db: {
-      url: process.env.DATABASE_URL,
-  }
-}
-});
-
-// Replica Database for read-only
-const prismaReplica = new PrismaClient({
-  datasources: {
-    db: {
-      url: process.env.DATABASE_URL_REPLICA,
-  }
-}
-});
 
 const server = new ApolloServer({
   typeDefs,
@@ -45,30 +34,32 @@ const server = new ApolloServer({
 const startServer = async () => {
   await server.start();
 
+  // Apply global middleware
+  app.use(contextMiddleware);
+  
+  // Passport oAuth
+  configurePassport();
+  app.use(passport.initialize());
+  app.use("/auth", OAuthRoute);
+
+  app.use(express.json());
   app.use(
     cors({
-      origin: "*",
+      origin: process.env.CLIENT_URL,
     })
   );
-  app.use(express.json());
 
-  app.use(
-    "/graphql",
-    expressMiddleware(server, {
-      context: async ({ req }): Promise<Context> => {
-        const token = req.headers.authorization || "";
-        let user = null;
+  app.use("/graphql", expressMiddleware(server, {
+    context: async ({ req }: { req: any }): Promise<Context> => {
+      const { user, prisma, prismaReplica } = req.context;
 
-        try {
-          user = jwt.verify(token, JWT_SECRET) as JwtPayload;
-
-          return { user, prisma, prismaReplica };
-        } catch (err) {
-          return { user, prisma, prismaReplica };
-        }
-      },
-    })
-  );
+      return { 
+        user,
+        prisma,
+        prismaReplica
+      }
+    }
+  }));
 
   // Create token for testing ONLY | delete THIS in production
   // This is for queries like graphql playground Authorization header
@@ -78,7 +69,7 @@ const startServer = async () => {
     };
 
     try {
-      const token = jwt.sign(temp, JWT_SECRET);
+      const token = jwt.sign(temp, process.env.JWT_SECRET!);
       res.send(token);
     } catch (err) {
       res.status(500).send(err);
