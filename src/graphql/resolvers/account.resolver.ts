@@ -52,15 +52,20 @@ export const resolvers = {
     },
     verifyMPIN: async (_: any, args: { phone: string; code: string }) => {
       try {
+        // TO DO: This is temporary to prevent spam during development
         // const verification = await client.verify.v2
         //   .services(serviceSID)
         //   .verificationChecks.create({
         //     to: args.phone,
         //     code: args.code,
         //   });
-        
-        // TO DO: This is temporary to prevent spam during development
-        const verification = { status: "approved" }
+
+        // if (!verification.valid) {
+        //   return {
+        //     success: false,
+        //     message: "Invalid MPIN",
+        //   };
+        // }
 
         // Create a token specific to phone number to save in client's cookies
         const token = createTokenPhone({ phone: args.phone });
