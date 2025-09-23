@@ -42,7 +42,8 @@ npm run prisma:migrate -- <name_your_migrate>
 
 # CONTENTS IN .env
 ```
-CLIENT_URL="client-url" # <Example: http://localhost:3000>
+CLIENT_URL="client-url" # <Example: http://localhost:3000> NO SLASH AT THE END
+BACKEND_URL="backend-url" # <Example: http://localhost:5000> NO SLASH AT THE END
 
 JWT_SECRET="<create-your-own-secret>"
 
