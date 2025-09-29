@@ -73,6 +73,14 @@ FACEBOOK_CLIENT_ID="<your-facebook-client-id>"
 FACEBOOK_CLIENT_SECRET="<your-facebook-secret-id>"
 ```
 
+**ALSO ADD THIS FOR AWS(AWS S3) IN .env**
+```
+AWS_REGION="ap-southeast-1"
+AWS_ACCESS_KEY_ID=""
+AWS_SECRET_ACCESS_KEY=""
+AWS_BUCKET_NAME=""
+```
+
 # EXTRAS
 1. To stop postgres database server
 ```
