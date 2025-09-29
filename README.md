@@ -40,6 +40,11 @@ npm run prisma:generate
 npm run prisma:migrate -- <name_your_migrate>
 ```
 
+6. Seed prisma (IMPORTANT)
+```
+npx prisma db seed
+```
+
 # CONTENTS IN .env
 ```
 CLIENT_URL="<client-url>" # Example: http://localhost:3000 NO SLASH AT THE END
@@ -83,4 +88,9 @@ docker-compose down -v
 ```
 npm run prisma:generate
 npm run prisma:migrate -- <name_your_migrate>
+```
+
+4. If you want to reset the entire database and migrate at the same time
+```
+npx prisma migrate reset
 ```
