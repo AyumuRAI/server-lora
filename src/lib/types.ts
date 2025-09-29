@@ -25,4 +25,40 @@ type CreateAccountDataAdmin = {
   role: "ADMIN" | "AGENT" | "USER";
 }
 
-export { CreateAccountData, CreateAccountDataAdmin };
+type SubmittedRequirementData = {
+  name: string;
+  uri: string;
+  type: string;
+  class: string;
+  subclass: string;
+  requirement: string;
+  uploadDate: string;
+  isImage?: boolean;
+}
+
+type Requirement = {
+  name: string;
+  class: string;
+  subclass: string;
+  files: [{ type: string, url: string }];
+}
+
+type LoanApplicationData = {
+  type: "REGULAR" | "BONUS";
+  amount: number;
+  terms: number;
+  monthlyIncome: number;
+  purpose: string;
+  isAtmCard: boolean;
+  isCheck: boolean;
+  isPassbook: boolean;
+  other: string;
+  selectedCompany: string;
+  documents: SubmittedRequirementData[];
+}
+
+export { 
+  CreateAccountData, CreateAccountDataAdmin, 
+  LoanApplicationData, SubmittedRequirementData,
+  Requirement
+};

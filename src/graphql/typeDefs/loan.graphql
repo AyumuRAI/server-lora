@@ -1,0 +1,43 @@
+scalar JSON
+
+enum LoanType {
+  REGULAR
+  BONUS
+}
+
+input LoanApplicationDataInput {
+  type: LoanType
+  amount: Float
+  terms: Int
+  monthlyIncome: Float
+  purpose: String
+  isAtmCard: Boolean
+  isCheck: Boolean
+  isPassBook: Boolean
+  other: String
+  selectedCompany: String
+  documents: [JSON]
+}
+
+type LoanApplicationResponse {
+  success: Boolean
+  message: String
+  company: JSON
+  loan: JSON
+  numberOfDocs: Int
+}
+
+type GetLendingCompaniesResponse {
+  success: Boolean
+  message: String
+  companies: [JSON]
+}
+
+# Main
+type Query {
+  getLendingCompanies: GetLendingCompaniesResponse
+}
+
+type Mutation {
+  submitLoanApplication(data: LoanApplicationDataInput): LoanApplicationResponse
+}

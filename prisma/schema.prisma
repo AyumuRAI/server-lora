@@ -26,6 +26,22 @@ enum Role {
   USER
 }
 
+enum LoanType {
+  REGULAR
+  BONUS
+}
+
+enum LoanStatusType {
+  PROCESSING
+  ACTIVE
+  COMPLETED
+}
+
+enum InterestType {
+  STRAIGHT
+  DIMINISHING
+}
+
 model Account {
   id String @id @default(uuid())
   phone String? @unique
@@ -46,4 +62,78 @@ model Account {
   password String?
   role Role @default(USER)
   createdAt DateTime @default(now())
+
+  loans Loans[]
+}
+
+model Loans {
+  id Int @id @default(autoincrement())
+  accountId String
+  type LoanType
+  amount Decimal
+  terms Int
+  monthlyIncome Decimal
+  purpose String
+  isAtmCard Boolean @default(false)
+  isCheck Boolean @default(false)
+  isPassBook Boolean @default(false)
+  other String @default("N/A")
+  selectedLendingCompany String
+  status LoanStatusType @default(PROCESSING)
+  createdAt DateTime @default(now())
+
+  account Account @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  submittedRequirements SubmittedRequirements[]
+}
+
+model SubmittedRequirements {
+  id String @id @default(uuid())
+  loanId Int
+  name String
+  class String
+  subclass String
+  createdAt DateTime @default(now())
+
+  loan Loans @relation(fields: [loanId], references: [id], onDelete: Cascade)
+  files SubmittedRequirementFiles[]
+}
+
+model SubmittedRequirementFiles {
+  id Int @id @default(autoincrement())
+  reqId String
+  url String
+  type String
+  createdAt DateTime @default(now())
+
+  requirement SubmittedRequirements @relation(fields: [reqId], references: [id], onDelete: Cascade)
+}
+
+model LendingCompanies {
+  id String @id @default(uuid())
+  name String @unique
+  interestRate Decimal
+  interestType InterestType
+  processingTime String
+  processingFee Decimal
+  isRequiredVisit Boolean
+  reviews Int
+  stars Decimal
+  about String
+  contact String
+  address String
+  logo String
+  loanMinAmount Decimal
+  loanMaxAmount Decimal
+  loanMinTerm Int
+  loanMaxTerm Int
+  
+  requirements LendingCompanyRequirements[]
+}
+
+model LendingCompanyRequirements {
+  id Int @id @default(autoincrement())
+  lendingCompanyId String
+  name String
+
+  requirement LendingCompanies @relation(fields: [lendingCompanyId], references: [id], onDelete: Cascade)
 }
