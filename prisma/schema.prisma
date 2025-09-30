@@ -80,8 +80,11 @@ model Loans {
   other String @default("N/A")
   selectedLendingCompany String
   status LoanStatusType @default(PROCESSING)
+  activedAt DateTime?
   createdAt DateTime @default(now())
+  remainingBalance Decimal
 
+  lendingCompany LendingCompanies @relation(fields: [selectedLendingCompany], references: [name], onDelete: Cascade)
   account Account @relation(fields: [accountId], references: [id], onDelete: Cascade)
   submittedRequirements SubmittedRequirements[]
 }
@@ -128,6 +131,7 @@ model LendingCompanies {
   loanMaxTerm Int
   
   requirements LendingCompanyRequirements[]
+  loans Loans[]
 }
 
 model LendingCompanyRequirements {
