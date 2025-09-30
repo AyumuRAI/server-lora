@@ -1,6 +1,7 @@
 import { Context } from "@lib/context";
 import { LoanApplicationData } from "@lib/types";
 import { formatRequirements } from "@actions/formatRequirements";
+import { format, addMonths } from "date-fns"
 
 // Enable custom scalar or custom graphql type
 import { GraphQLJSON } from "graphql-type-json";
@@ -37,6 +38,79 @@ export const resolvers = {
           message: err.message
         };
       };
+    },
+    getUserLoans: async (_: any, args: {}, context: Context) => {
+      try {
+        if (!context.user) {
+          return {
+            success: false,
+            message: "Unauthorized"
+          };
+        }
+
+        const user = context.user as { id: string, role: "AGENT" | "ADMIN" | "USER" };
+
+        const loans = await context.prismaReplica.loans.findMany({
+          where: {
+            accountId: user.id
+          },
+          include: {
+            lendingCompany: true
+          }
+        })
+
+        if (!loans) {
+          return {
+            success: false,
+            message: "No loans found",
+            loans: []
+          }
+        }
+
+        const formattedLoans = loans.map((loan) => {
+          const loanAmount = parseFloat(loan.amount.toString());
+          const dueDate = loan.activedAt ? format(addMonths(loan.activedAt, 1), "MMM dd, yyyy") : "N/A";
+          const monthlyPayment = loanAmount / loan.terms;
+          const totalInterest =  (loanAmount * parseFloat(loan.lendingCompany.interestRate.toString()));
+          const loanTerms = loan.terms + " months";
+          const applicationDate = format(loan.createdAt, "MMM, dd, yyyy");
+
+          return {
+            ...loan,
+            interestRate: parseFloat(loan.lendingCompany.interestRate.toString()) * 100,
+            term: loanTerms,
+            nextPayment: dueDate,
+            nextPaymentAmount: monthlyPayment,
+            lender: loan.lendingCompany.name,
+            applicationDate,
+            dueDate,
+            totalAmountDue: monthlyPayment,
+
+            // Additional fields needed for PayNowScreen
+            loanAmount: loan.amount,
+            totalInterest,
+            interestType: loan.lendingCompany.interestType,
+            processingFee: loan.lendingCompany.processingFee,
+            monthlyPayment,
+            totalPayment: monthlyPayment,
+            netRelease: loanAmount - parseFloat(loan.lendingCompany.processingFee.toString()),
+            terms: loanTerms,
+            date: applicationDate,
+          };
+        });
+
+        return {
+          success: true,
+          message: "Loans fetched successfully",
+          loans: formattedLoans
+        };
+
+      } catch (err: any) {
+        return {
+          success: false,
+          message: err.message
+        };
+      }
     } 
   },
   Mutation: {
@@ -72,6 +146,7 @@ export const resolvers = {
             accountId: user.id,
             type: args.data.type,
             amount: args.data.amount,
+            remainingBalance: args.data.amount, // Set remaining balance to the same as the initial amount
             terms: args.data.terms,
             monthlyIncome: args.data.monthlyIncome,
             purpose: args.data.purpose,
@@ -96,6 +171,7 @@ export const resolvers = {
         };
 
       } catch (err: any) {
+        console.log(err);
         return {
           success: false,
           message: err.message
