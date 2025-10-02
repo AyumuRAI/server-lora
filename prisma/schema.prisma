@@ -42,6 +42,36 @@ enum InterestType {
   DIMINISHING
 }
 
+enum LoanTransactionType {
+  PAYMENT
+}
+
+enum LoanTransactionMethodType {
+  GCASH
+  LORA_WALLET
+  BANK_TRANSFER
+  DEBIT_CARD
+  CREDIT_CARD
+}
+
+enum LoanTransactionStatusType {
+  PENDING
+  COMPLETED
+  FAILED
+}
+
+enum WalletTransactionType {
+  CASH_IN
+}
+
+enum WalletTransactionMethodType {
+  GCASH
+  PAYMAYA
+  DEBIT_CARD
+  CREDIT_CARD
+  OVER_THE_COUNTER
+}
+
 model Account {
   id String @id @default(uuid())
   phone String? @unique
@@ -64,6 +94,7 @@ model Account {
   createdAt DateTime @default(now())
 
   loans Loans[]
+  wallets Wallets[]
 }
 
 model Loans {
@@ -87,6 +118,7 @@ model Loans {
   lendingCompany LendingCompanies @relation(fields: [selectedLendingCompany], references: [name], onDelete: Cascade)
   account Account @relation(fields: [accountId], references: [id], onDelete: Cascade)
   submittedRequirements SubmittedRequirements[]
+  transactions LoanTransactions[]
 }
 
 model SubmittedRequirements {
@@ -140,4 +172,39 @@ model LendingCompanyRequirements {
   name String
 
   requirement LendingCompanies @relation(fields: [lendingCompanyId], references: [id], onDelete: Cascade)
+}
+
+model LoanTransactions {
+  id Int @id @default(autoincrement())
+  loanId Int
+  type LoanTransactionType @default(PAYMENT)
+  amount Decimal
+  method LoanTransactionMethodType
+  createdAt DateTime @default(now())
+  approvedAt DateTime?
+  status LoanTransactionStatusType
+  failReason String?
+
+  loan Loans @relation(fields: [loanId], references: [id], onDelete: Cascade)
+}
+
+model Wallets {
+  id Int @id @default(autoincrement())
+  accountId String @unique
+  balance Decimal
+  createdAt DateTime @default(now())
+
+  account Account @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  transactions WalletTransactions[]
+}
+
+model WalletTransactions {
+  id Int @id @default(autoincrement())
+  walletId Int
+  type WalletTransactionType
+  amount Decimal
+  method WalletTransactionMethodType
+  createdAt DateTime @default(now())
+
+  wallet Wallets @relation(fields: [walletId], references: [id], onDelete: Cascade)
 }

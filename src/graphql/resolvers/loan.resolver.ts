@@ -111,6 +111,78 @@ export const resolvers = {
           message: err.message
         };
       }
+    },
+    getLoanTransactions: async (_:any, args: {}, context: Context) => {
+      try {
+        if (!context.user) {
+          return {
+            success: false,
+            message: "Unauthorized"
+          };
+        };
+        
+        const user = context.user as { id: string, role: "AGENT" | "ADMIN" | "USER" };
+
+        const loanTransactions = await context.prismaReplica.loans.findMany({
+          where: {
+            accountId: user.id,
+            status: {
+              not: "PROCESSING"
+            },
+            transactions: {
+              some: {}
+            }
+          },
+          include: {
+            transactions: true,
+            lendingCompany: true
+          }
+        });
+
+        const formattedTransactions: Array<Object> = [];
+
+        loanTransactions.forEach((loan) => {
+          loan.transactions.forEach((tx) => {
+            formattedTransactions.push({
+                transactionId: tx.id,
+                paymentMethod: tx.method,
+                type: tx.type.charAt(0) + tx.type.toLowerCase().slice(1),
+                amount: parseFloat(tx.amount.toString()).toFixed(2),
+                date: format(tx.createdAt, "MMM dd, yyyy"),
+                time: format(tx.createdAt, "hh:mm a"),
+                status: tx.status.charAt(0) + tx.status.toLowerCase().slice(1),
+
+                // Loan Details
+                id: formattedTransactions.length,
+                loanId: loan.id,
+                lender: loan.lendingCompany.name,
+                loanAmount: loan.amount,
+                loanType: loan.type,
+                applicationDate: loan.activedAt && format(loan.activedAt, "MMM dd, yyyy"),
+                interestRate: parseFloat(loan.lendingCompany.interestRate.toString()) * 100,
+                interestType: loan.lendingCompany.interestType,
+                term: loan.terms + " months",
+                totalInterest: parseFloat(loan.amount.toString()) * parseFloat(loan.lendingCompany.interestRate.toString()),
+                processingFee: loan.lendingCompany.processingFee,
+                dueDate: "SAMPLE", // TO DO: Replace with actual due date
+                monthlyPayment: parseFloat(loan.amount.toString()) / loan.terms,
+                netRelease: parseFloat(loan.amount.toString()) - parseFloat(loan.lendingCompany.processingFee.toString()),
+              })
+            })
+        });
+
+        return {
+          success: true,
+          message: "Loan transactions fetched successfully",
+          loanTransactions: formattedTransactions
+        };
+
+      } catch (err: any) {
+        return {
+          success: false,
+          message: err.message
+        }
+      }
     } 
   },
   Mutation: {

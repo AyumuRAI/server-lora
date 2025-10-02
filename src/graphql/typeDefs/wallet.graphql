@@ -1,0 +1,29 @@
+type GetWalletResponse {
+  success: Boolean
+  message: String
+  balance: Float
+}
+
+type WalletResponse {
+  success: Boolean
+  message: String
+}
+
+# Add/update methods when needed
+enum CashInMethodType {
+  GCASH
+  PAYMAYA
+  OVER_THE_COUNTER
+  DEBIT_CARD
+  CREDIT_CARD
+}
+
+# Main
+type Query {
+  getWalletBalance: GetWalletResponse
+}
+
+type Mutation {
+  walletCashIn(amount: Float, method: CashInMethodType): WalletResponse 
+  walletPayment(loanId: Int): WalletResponse
+} 
