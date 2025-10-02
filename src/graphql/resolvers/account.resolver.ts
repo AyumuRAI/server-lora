@@ -105,7 +105,16 @@ export const resolvers = {
     createAccount: async (_: any, args: { data: CreateAccountData }, context: Context) => {
       try {
         const account = await context.prisma.account.create({
-          data:  {...args.data }
+          data:  { 
+            ...args.data, 
+
+            // Create a initial wallet balance for new account, this will also include relating the account id
+            wallets: {
+              create: {
+                balance: 0
+              }
+            } 
+          }
         })
 
         const token = createToken({

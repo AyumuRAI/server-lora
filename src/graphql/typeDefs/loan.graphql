@@ -39,10 +39,17 @@ type GetUserLoansResponse {
   loans: [JSON]
 }
 
+type GetLoanTransactions {
+  success: Boolean
+  message: String
+  loanTransactions: [JSON]
+}
+
 # Main
 type Query {
   getLendingCompanies: GetLendingCompaniesResponse
   getUserLoans: GetUserLoansResponse
+  getLoanTransactions: GetLoanTransactions
 }
 
 type Mutation {

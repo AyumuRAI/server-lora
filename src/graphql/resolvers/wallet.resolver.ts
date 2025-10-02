@@ -1,0 +1,178 @@
+import { Context } from "@lib/context";
+import { User, CashInMethodType } from "@lib/types";
+
+export const resolvers = {
+  Query: {
+    getWalletBalance: async (_:any, args: {}, context: Context) => {
+      try {
+          if (!context.user) {
+            return {
+              success: false,
+              message: "Unauthorized"
+            };
+          };
+
+          const user = context.user as User;
+
+          const account = await context.prismaReplica.account.findUnique({
+            where: {
+              id: user.id
+            },
+            include: {
+              wallets: true
+            }
+          })
+
+          return {
+            success: true,
+            message: "Wallet balance fetched successfully",
+            balance: account?.wallets[0].balance 
+          }
+
+      } catch (err: any) {
+        return {
+          success: false,
+          message: err.message
+        };
+      }
+    }
+  },
+  Mutation: {
+    walletCashIn: async (_:any, args: { amount: number, method: CashInMethodType }, context: Context) => {
+      try {
+        if (!context.user) {
+          return {
+            success: false,
+            message: "Unauthorized"
+          };
+        };
+
+        const user = context.user as User;
+
+        await context.prisma.wallets.update({
+          where: {
+            accountId: user.id
+          },
+          data: {
+            balance: {
+              increment: args.amount
+            }
+          }
+        })
+
+        return {
+          success: true,
+          message: "Wallet cashed in successfully"
+        }
+
+      } catch (err: any) {
+        return {
+          success: false,
+          message: err.message
+        }
+      }
+    },
+    walletPayment: async (_:any, args: { loanId: number }, context: Context) => {
+      try {
+        if (!context.user) {
+          return {
+            success: false,
+            message: "Unauthorized"
+          }
+        };
+
+        const user = context.user as User;
+
+        const account = await context.prismaReplica.account.findUnique({
+          where: {
+            id: user.id,
+          },
+          include: {
+            wallets: true,
+            loans: {
+              where: {
+                id: args.loanId
+              }
+            }
+          }
+        });
+
+        if (!account) {
+          return {
+            success: false,
+            message: "Account not found"
+          };
+        };
+
+        const walletBalance = parseFloat(account.wallets[0].balance.toString());
+        const monthlyPayment = parseFloat(account.loans[0].amount.toString()) / account.loans[0].terms;
+        const loanRemainingBalance = parseFloat(account.loans[0].remainingBalance.toString()).toFixed(2)
+
+        // Check if wallet balance is less than loan monthly amount
+        if ( walletBalance < monthlyPayment) {
+          return {
+            success: false,
+            message: "Wallet balance is less than current loan amount"
+          };
+        };
+
+        await context.prisma.$transaction(async (tx) => {
+          await tx.wallets.update({
+            where: {
+              accountId: user.id
+            },
+            data: {
+              balance: {
+                decrement: monthlyPayment
+              }
+            }
+          });
+
+          await tx.loans.update({
+            where: {
+              id: args.loanId
+            },
+            data: {
+              remainingBalance: {
+                decrement: monthlyPayment
+              }
+            }
+          });
+
+          // create loan transaction history
+          await tx.loanTransactions.create({
+            data: {
+              loanId: args.loanId,
+              type: "PAYMENT",
+              amount: monthlyPayment,
+              method: "LORA_WALLET", // This is temporary
+              status: "COMPLETED"
+            }
+          });
+
+          // If remaining balance is equals to monthly payment, close loan
+          if (loanRemainingBalance === monthlyPayment.toFixed(2)) {
+            await tx.loans.update({
+              where: {
+                id: args.loanId
+              },
+              data: {
+                status: "COMPLETED"
+              }
+            })
+          };
+        });
+
+        return {
+          success: true,
+          message: "Wallet payment successful"
+        };
+      } catch (err: any) {
+        return {
+          success: false,
+          message: err.message
+        };
+      }
+    }
+  }
+}

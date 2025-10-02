@@ -57,8 +57,15 @@ type LoanApplicationData = {
   documents: SubmittedRequirementData[];
 }
 
+type User = {
+  id: string;
+  role: "AGENT" | "ADMIN" | "USER";
+}
+
+type CashInMethodType = "GCASH" | "OVER_THE_COUNTER" | "PAYMAYA" | "CREDIT_CARD" | "DEBIT_CARD";
+
 export { 
   CreateAccountData, CreateAccountDataAdmin, 
   LoanApplicationData, SubmittedRequirementData,
-  Requirement
+  Requirement, User, CashInMethodType
 };
