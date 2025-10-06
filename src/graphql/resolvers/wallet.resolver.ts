@@ -1,7 +1,12 @@
 import { Context } from "@lib/context";
 import { User, CashInMethodType } from "@lib/types";
+import { format } from "date-fns";
+import { GraphQLJSON } from "graphql-type-json"
 
 export const resolvers = {
+  // Apply custom scalar
+  JSON: GraphQLJSON,
+
   Query: {
     getWalletBalance: async (_:any, args: {}, context: Context) => {
       try {
@@ -35,6 +40,50 @@ export const resolvers = {
           message: err.message
         };
       }
+    },
+    getWalletTransactions: async (_:any, args: {}, context: Context) => {
+      try {
+        if (!context.user) {
+          return {
+            success: false,
+            message: "Unauthorized"
+          };
+        };
+
+        const user = context.user as User;
+
+        const transactions = await context.prismaReplica.wallets.findUnique({
+          where: {
+            accountId: user.id
+          },
+          include: {
+            transactions: true
+          }
+        });
+
+        const formattedWalletTransactions = transactions?.transactions.map((transaction) => {
+          return {
+            id: transaction.id,
+            type: transaction.type.replace("_", " "),
+            amount: transaction.amount,
+            source: transaction.method,
+            date: format(transaction.createdAt, "MMMM, dd hh:mm a"),
+            status: "Completed"
+          }
+        });
+
+        return {
+          success:true,
+          message: "Wallet transactions fetched successfully",
+          transactions: formattedWalletTransactions
+        };
+
+      } catch (err: any) {
+        return {
+          success: false,
+          message: err.message
+        };
+      };
     }
   },
   Mutation: {
@@ -48,7 +97,7 @@ export const resolvers = {
         };
 
         const user = context.user as User;
-
+        
         await context.prisma.wallets.update({
           where: {
             accountId: user.id
@@ -56,6 +105,15 @@ export const resolvers = {
           data: {
             balance: {
               increment: args.amount
+            },
+            transactions: {
+              create: [
+                {
+                  type: "CASH_IN",
+                  amount: args.amount,
+                  method: args.method
+                }
+              ]
             }
           }
         })

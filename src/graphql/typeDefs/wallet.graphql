@@ -1,7 +1,15 @@
+scalar JSON
+
 type GetWalletResponse {
   success: Boolean
   message: String
   balance: Float
+}
+
+type GetWalletTransactionResponse {
+  success: Boolean
+  message: String
+  transactions: [JSON]
 }
 
 type WalletResponse {
@@ -21,6 +29,7 @@ enum CashInMethodType {
 # Main
 type Query {
   getWalletBalance: GetWalletResponse
+  getWalletTransactions: GetWalletTransactionResponse
 }
 
 type Mutation {
