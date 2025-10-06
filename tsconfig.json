@@ -7,10 +7,10 @@
     "rootDir": "./",
     "strict": true,
     "esModuleInterop": true,
-    "baseUrl": "src",
     "paths": {
-      "@lib/*": ["lib/*"],
-      "@actions/*": ["graphql/actions/*"]
+      "@/*": ["./src/*"],
+      "@lib/*": ["./src/lib/*"],
+      "@actions/*": ["./src/graphql/actions/*"]
     }
   },
   "include": ["**/*.ts"],
