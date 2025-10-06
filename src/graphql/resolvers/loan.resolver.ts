@@ -183,6 +183,76 @@ export const resolvers = {
           message: err.message
         }
       }
+    },
+    getUserCurrentLoan: async (_:any, args: {}, context: Context) => {
+      try {
+        if (!context.user) {
+          return {
+            success: false,
+            message: "Unauthorized"
+          };
+        };
+
+        const user = context.user as { id: string, role: "AGENT" | "ADMIN" | "USER" };
+
+        // Get the latest current loan
+        const currentLoan = await context.prismaReplica.loans.findFirst({
+          where: {
+            accountId: user.id,
+            status: "ACTIVE",
+          },
+          include: {
+            lendingCompany: true
+          },
+          orderBy: {
+            id: "desc"
+          }
+        }) ?? {} as any;
+
+        const formattedCurrentLoan = [currentLoan].map((loan) => {
+          const loanAmount = parseFloat(loan.amount.toString());
+          const dueDate = loan.activedAt ? format(addMonths(loan.activedAt, 1), "MMM dd, yyyy") : "N/A";
+          const monthlyPayment = loanAmount / loan.terms;
+          const totalInterest =  (loanAmount * parseFloat(loan.lendingCompany.interestRate.toString()));
+          const loanTerms = loan.terms + " months";
+          const applicationDate = format(loan.createdAt, "MMM, dd, yyyy");
+
+          return {
+            ...loan,
+            interestRate: parseFloat(loan.lendingCompany.interestRate.toString()) * 100,
+            term: loanTerms,
+            nextPayment: dueDate,
+            nextPaymentAmount: monthlyPayment,
+            lender: loan.lendingCompany.name,
+            applicationDate,
+            dueDate,
+            totalAmountDue: monthlyPayment,
+
+            // Additional fields needed for PayNowScreen
+            loanAmount: loan.amount,
+            totalInterest,
+            interestType: loan.lendingCompany.interestType,
+            processingFee: loan.lendingCompany.processingFee,
+            monthlyPayment,
+            totalPayment: monthlyPayment,
+            netRelease: loanAmount - parseFloat(loan.lendingCompany.processingFee.toString()),
+            terms: loanTerms,
+            date: applicationDate
+          };
+        })[0];
+
+        return {
+          success: true,
+          message: "Loan fetched successfully",
+          currentLoan: formattedCurrentLoan
+        };
+
+      } catch (err: any) {
+        return {
+          success: false,
+          message: err.message
+        };
+      };
     } 
   },
   Mutation: {
