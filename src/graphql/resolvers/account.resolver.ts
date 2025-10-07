@@ -1,8 +1,9 @@
 import { Context } from "@lib/context";
-import { CreateAccountData, CreateAccountDataAdmin } from "@lib/types";
+import { CreateAccountData, CreateAccountDataAdmin, User } from "@lib/types";
 import dotenv from "dotenv";
 import twilio from "twilio";
 import { createToken, createTokenPhone } from "@actions/clientAccountToken";
+import { GraphQLJSON } from "graphql-type-json";
 
 dotenv.config();
 
@@ -13,6 +14,8 @@ const serviceSID = process.env.TWILIO_SERVICE_SID!;
 const client = twilio(accountSid, authToken);
 
 export const resolvers = {
+  JSON: GraphQLJSON,
+
   Query: {
     sendMPIN: async (_: any, args: { phone: string }, context: Context) => {
       try {
@@ -98,6 +101,46 @@ export const resolvers = {
         success: false,
         message: "Invalid token"
       }
+    },
+    getProfileData: async (_:any, args: {}, context: Context) => {
+      try {
+        if (!context.user) {
+          return {
+            success: false,
+            message: "Unauthorized"
+          };
+        };
+
+        const user = context.user as User;
+
+        const account = await context.prismaReplica.account.findUnique({
+          where: {
+            id: user.id
+          }
+        });
+
+        if (!account) {
+          return {
+            success: false,
+            message: "Account not found"
+          };
+        };
+
+        // Does not include pinCode and password
+        const { pinCode, password, ...filtered } = account;
+
+        return {
+          success: true,
+          message: "Profile data fetched successfully",
+          account: filtered
+        };
+
+      } catch (err: any) {
+        return {
+          success: false,
+          message: err.message
+        };
+      };
     }
   },
   Mutation: {

@@ -1,3 +1,5 @@
+scalar JSON
+
 enum Roles {
   ADMIN
   AGENT
@@ -47,11 +49,18 @@ type ResponsePhoneToken {
   phone: String
 }
 
+type ResponseGetAccount {
+  success: Boolean
+  message: String
+  account: JSON
+}
+
 # Main
 type Query {
   sendMPIN(phone: String): ResponseMPIN
   verifyMPIN(phone: String, code: String): ResponseMPIN
   extractPhoneFromToken: ResponsePhoneToken
+  getProfileData: ResponseGetAccount
 }
 
 type Mutation {
