@@ -101,6 +101,7 @@ model Account {
 
   loans Loans[]
   wallets Wallets[]
+  notifications Notifications[]
 }
 
 model Loans {
@@ -213,4 +214,15 @@ model WalletTransactions {
   createdAt DateTime @default(now())
 
   wallet Wallets @relation(fields: [walletId], references: [id], onDelete: Cascade)
+}
+
+model Notifications {
+  id Int @id @default(autoincrement())
+  accountId String
+  title String
+  message String
+  createdAt DateTime @default(now())
+  isRead Boolean @default(false)
+
+  account Account @relation(fields: [accountId], references: [id], onDelete: Cascade)
 }

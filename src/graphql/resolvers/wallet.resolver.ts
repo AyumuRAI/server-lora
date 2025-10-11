@@ -97,27 +97,37 @@ export const resolvers = {
         };
 
         const user = context.user as User;
-        
-        await context.prisma.wallets.update({
-          where: {
-            accountId: user.id
-          },
-          data: {
-            balance: {
-              increment: args.amount
-            },
-            transactions: {
-              create: [
-                {
-                  type: "CASH_IN",
-                  amount: args.amount,
-                  method: args.method
-                }
-              ]
-            }
-          }
-        })
 
+        await context.prisma.$transaction([
+          context.prisma.wallets.update({
+            where: {
+              accountId: user.id
+            },
+            data: {
+              balance: {
+                increment: args.amount
+              },
+              transactions: {
+                create: [
+                  {
+                    type: "CASH_IN",
+                    amount: args.amount,
+                    method: args.method
+                  }
+                ]
+              }
+            }
+          }),
+
+          context.prisma.notifications.create({
+            data: {
+              accountId: user.id,
+              title: "Cash In Successful",
+              message: `Php ${args.amount.toLocaleString("en-PH",{ currency: "PHP", maximumFractionDigits: 2 })} has been added to your wallet via ${args.method}.`
+            }
+          })
+        ]);
+        
         return {
           success: true,
           message: "Wallet cashed in successfully"
@@ -205,6 +215,15 @@ export const resolvers = {
               amount: monthlyPayment,
               method: "LORA_WALLET", // This is temporary
               status: "COMPLETED"
+            }
+          });
+
+          // Create a notification after payment
+          await tx.notifications.create({
+            data: {
+              accountId: user.id,
+              title: "Payment Received",
+              message: `Your payment of Php ${monthlyPayment.toFixed(2)} has been processed`
             }
           });
 
