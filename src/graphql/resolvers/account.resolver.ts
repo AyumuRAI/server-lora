@@ -141,6 +141,36 @@ export const resolvers = {
           message: err.message
         };
       };
+    },
+    getUserNotifications: async (_: any, args: {}, context: Context) => {
+      try {
+        if (!context.user) {
+          return {
+            success: false,
+            message: "Unauthorized"
+          };
+        };
+
+        const user = context.user as User;
+
+        const notifications = await context.prismaReplica.notifications.findMany({
+          where: {
+            accountId: user.id
+          }
+        });
+
+        return {
+          success: true,
+          message: "Notifications fetched successfully",
+          notifications
+        };
+
+      } catch (err: any) {
+        return {
+          success: false,
+          message: err.message
+        };
+      };
     }
   },
   Mutation: {
@@ -297,6 +327,49 @@ export const resolvers = {
           message: err.message
         }
       }
+    },
+    updateNotifications: async (_: any, args: { notifId?: number | null }, context: Context) => {
+      try {
+        if (!context.user) {
+          return {
+            success: false,
+            message: "Unauthorized"
+          };
+        };
+
+        const user = context.user as User;
+
+        if (args.notifId) {
+          await context.prisma.notifications.update({
+            where: {
+              id: args.notifId
+            },
+            data: {
+              isRead: true
+            }
+          });
+        } else {
+          await context.prisma.notifications.updateMany({
+            where: {
+              accountId: user.id
+            },
+            data: {
+              isRead: true
+            }
+          });
+        };
+
+        return {
+          success: true,
+          message: "Notifications updated successfully"
+        };
+
+      } catch (err: any) {
+        return {
+          success: false,
+          message: err.message
+        };
+      };
     }
   },
 };
