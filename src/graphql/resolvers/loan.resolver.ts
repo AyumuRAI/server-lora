@@ -202,7 +202,8 @@ export const resolvers = {
             status: "ACTIVE",
           },
           include: {
-            lendingCompany: true
+            lendingCompany: true,
+            transactions: true
           },
           orderBy: {
             id: "desc"

@@ -190,6 +190,7 @@ model LoanTransactions {
   createdAt DateTime @default(now())
   approvedAt DateTime?
   status LoanTransactionStatusType
+  referenceNumber String @unique @default(uuid())
   failReason String?
 
   loan Loans @relation(fields: [loanId], references: [id], onDelete: Cascade)

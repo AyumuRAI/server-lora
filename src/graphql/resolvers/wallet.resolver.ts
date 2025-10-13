@@ -184,7 +184,7 @@ export const resolvers = {
           };
         };
 
-        await context.prisma.$transaction(async (tx) => {
+        const prismaTransaction = await context.prisma.$transaction(async (tx) => {
           await tx.wallets.update({
             where: {
               accountId: user.id
@@ -208,7 +208,7 @@ export const resolvers = {
           });
 
           // create loan transaction history
-          await tx.loanTransactions.create({
+          const transaction = await tx.loanTransactions.create({
             data: {
               loanId: args.loanId,
               type: "PAYMENT",
@@ -238,11 +238,15 @@ export const resolvers = {
               }
             })
           };
+
+          return transaction;
         });
 
         return {
           success: true,
-          message: "Wallet payment successful"
+          message: "Wallet payment successful",
+          transactionId: prismaTransaction.id,
+          referenceNumber: prismaTransaction.referenceNumber
         };
       } catch (err: any) {
         return {
