@@ -17,6 +17,13 @@ type WalletResponse {
   message: String
 }
 
+type WalletPaymentResponse {
+  success: Boolean
+  message: String
+  transactionId: Int
+  referenceNumber: String
+}
+
 # Add/update methods when needed
 enum CashInMethodType {
   GCASH
@@ -34,5 +41,5 @@ type Query {
 
 type Mutation {
   walletCashIn(amount: Float, method: CashInMethodType): WalletResponse 
-  walletPayment(loanId: Int): WalletResponse
+  walletPayment(loanId: Int): WalletPaymentResponse
 } 
