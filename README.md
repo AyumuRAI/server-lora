@@ -16,10 +16,10 @@ git checkout develop
 npm install
 ```
 
-3. Start the postgres database (MAKE SURE DOCKER IS INSTALLED IN YOUR SYSTEM)
+3. Create the postgres database (MAKE SURE DOCKER IS INSTALLED IN YOUR SYSTEM)
 
 ```
-npm run start:postgres
+npm run create:postgres
 ```
 
 4. Generate prisma
@@ -45,6 +45,11 @@ npm run prisma:migrate -- <name_your_migrate>
 npx prisma db seed
 ```
 
+7. Finally, start the server
+```
+npm run dev
+```
+
 # CONTENTS IN .env
 ```
 CLIENT_URL="<client-url>" # Example: http://localhost:3000 NO SLASH AT THE END
@@ -52,8 +57,8 @@ BACKEND_URL="<backend-url>" # Example: http://localhost:5000 NO SLASH AT THE END
 
 JWT_SECRET="<create-your-own-secret>"
 
-DATABASE_URL="postgres://admin:admin123@localhost:5433/lora"
-DATABASE_URL_REPLICA="postgres://admin:admin123@localhost:5434/lora"
+DATABASE_URL="postgres://admin:admin123@localhost:5432/lora"
+DATABASE_URL_REPLICA="postgres://admin:admin123@localhost:5432/lora"
 ```
 
 **ALSO ADD THIS FOR TWILIO SID, AUTH KEY IN .env**
@@ -82,23 +87,28 @@ AWS_BUCKET_NAME=""
 ```
 
 # EXTRAS
-1. To stop postgres database server
+1. To start postgres database server
 ```
-npm run stop:postgres
-```
-
-2. To delete the entire postgres database
-```
-docker-compose down -v
+docker start server-lora
 ```
 
-3. If you update the schema.prisma, you must run prisma generate and prisma migrate again.
+2. To stop postgres database server
+```
+docker stop server-lora
+```
+
+3. To remove postgres database server
+```
+docker rm server-lora
+```
+
+4. If you update the schema.prisma, you must run prisma generate and prisma migrate again.
 ```
 npm run prisma:generate
 npm run prisma:migrate -- <name_your_migrate>
 ```
 
-4. If you want to reset the entire database and migrate at the same time
+5. If you want to reset the entire database and migrate at the same time
 ```
 npx prisma migrate reset
 ```
