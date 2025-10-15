@@ -50,65 +50,55 @@ npx prisma db seed
 npm run dev
 ```
 
-# CONTENTS IN .env
+# .env
 ```
-CLIENT_URL="<client-url>" # Example: http://localhost:3000 NO SLASH AT THE END
-BACKEND_URL="<backend-url>" # Example: http://localhost:5000 NO SLASH AT THE END
+CLIENT_URL="http://localhost:3000"
+BACKEND_URL="http://localhost:5000"
 
-JWT_SECRET="<create-your-own-secret>"
+JWT_SECRET="7it9Y9dLAapeBgeRPUcAee9d"
 
 DATABASE_URL="postgres://admin:admin123@localhost:5432/lora"
 DATABASE_URL_REPLICA="postgres://admin:admin123@localhost:5432/lora"
-```
 
-**ALSO ADD THIS FOR TWILIO SID, AUTH KEY IN .env**
-
-```
 TWILIO_ACCOUNT_SID="<your-account-sid>"
 TWILIO_AUTH_TOKEN="<your-auth-token>"
 TWILIO_SERVICE_SID="<your-service-id>"
-```
 
-**ALSO ADD THIS FOR oAUTH(GOOGLE, FACEBOOK) IN .env**
-```
 GOOGLE_CLIENT_ID="<your-google-client-id>"
 GOOGLE_CLIENT_SECRET="<your-google-secret-id>"
 
 FACEBOOK_CLIENT_ID="<your-facebook-client-id>"
 FACEBOOK_CLIENT_SECRET="<your-facebook-secret-id>"
-```
 
-**ALSO ADD THIS FOR AWS(AWS S3) IN .env**
-```
 AWS_REGION="ap-southeast-1"
-AWS_ACCESS_KEY_ID=""
-AWS_SECRET_ACCESS_KEY=""
-AWS_BUCKET_NAME=""
+AWS_ACCESS_KEY_ID="<your-aws-access-key-id>"
+AWS_SECRET_ACCESS_KEY="<your-aws-secret-access-key>"
+AWS_BUCKET_NAME="<your-aws-bucket-name>"
 ```
 
 # EXTRAS
-1. To start postgres database server
+To start postgres database server
 ```
 docker start server-lora
 ```
 
-2. To stop postgres database server
+To stop postgres database server
 ```
 docker stop server-lora
 ```
 
-3. To remove postgres database server
+To remove postgres database server
 ```
 docker rm server-lora
 ```
 
-4. If you update the schema.prisma, you must run prisma generate and prisma migrate again.
+If you update the schema.prisma, you must run prisma generate and prisma migrate again.
 ```
 npm run prisma:generate
 npm run prisma:migrate -- <name_your_migrate>
 ```
 
-5. If you want to reset the entire database and migrate at the same time
+If you want to reset the entire database and migrate at the same time
 ```
 npx prisma migrate reset
 ```
