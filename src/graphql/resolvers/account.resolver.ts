@@ -19,19 +19,6 @@ export const resolvers = {
   Query: {
     sendMPIN: async (_: any, args: { phone: string }, context: Context) => {
       try {
-        const isExist = await context.prismaReplica.account.findUnique({
-          where: {
-            phone: args.phone,
-          },
-        })
-
-        if (isExist) {
-          return {
-            success: false,
-            message: "Account already exist",
-          };
-        }
-
         // const verification = await client.verify.v2
         //   .services(serviceSID)
         //   .verifications.create({
@@ -369,6 +356,38 @@ export const resolvers = {
           success: false,
           message: err.message
         };
+      };
+    },
+    forgetPasswordMobile: async (_: any, args: { newPassword: string }, context: Context) => {
+      try {
+        if(!context.user) {
+          return {
+            success: false,
+            message: "Unauthorized"
+          };
+        };
+
+        const user = context.user as { phone: string };
+
+        await context.prisma.account.update({
+          where: {
+            phone: '+63' + user.phone,
+          },
+          data: {
+            pinCode: args.newPassword
+          }
+        });
+
+        return {
+          success: true,
+          message: "Password updated successfully"
+        };
+        
+      } catch (err: any) {
+        return {
+          success: false,
+          message: err.message
+        }
       };
     }
   },
