@@ -5,8 +5,7 @@
   "main": "index.ts",
   "scripts": {
     "dev": "nodemon --exec ts-node -r tsconfig-paths/register src/index.ts",
-    "start:postgres": "shx chmod +x docker-scripts/start.sh && docker-scripts/start.sh",
-    "stop:postgres": "docker-compose down",
+    "create:postgres": "docker run -d --name server-lora --restart always -e POSTGRES_USER=admin -e POSTGRES_PASSWORD=admin123 -e POSTGRES_DB=lora -p 5432:5432 postgres",
     "prisma:generate": "npx prisma generate",
     "prisma:migrate": "npx prisma migrate dev --name"
   },
@@ -47,8 +46,5 @@
     "tsconfig-paths": "^4.2.0",
     "twilio": "^5.9.0",
     "typescript": "^5.9.2"
-  },
-  "devDependencies": {
-    "shx": "^0.4.0"
   }
 }
