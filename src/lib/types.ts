@@ -60,6 +60,7 @@ type LoanApplicationData = {
 type User = {
   id: string;
   role: "AGENT" | "ADMIN" | "USER";
+  phoneNumber?: string;
 }
 
 type CashInMethodType = "GCASH" | "OVER_THE_COUNTER" | "PAYMAYA" | "CREDIT_CARD" | "DEBIT_CARD";

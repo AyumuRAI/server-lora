@@ -66,6 +66,11 @@ type ResponseUpdateNotifications {
   message: String
 }
 
+type ResponseForgetPassword {
+  success: Boolean
+  message: String
+}
+
 # Main
 type Query {
   sendMPIN(phone: String): ResponseMPIN
@@ -81,4 +86,5 @@ type Mutation {
   loginAccount(phone: String, pinCode: String): ResponseAccount
   loginAccountWeb(email: String, password: String): ResponseAccount
   updateNotifications(notifId: Int): ResponseUpdateNotifications
+  forgetPasswordMobile(newPassword: String): ResponseForgetPassword
 }
