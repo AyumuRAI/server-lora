@@ -45,6 +45,11 @@ npm run prisma:migrate -- <name_your_migrate>
 npx prisma db seed
 ```
 
+7. Finally, start the server
+```
+npm run dev
+```
+
 # CONTENTS IN .env
 ```
 CLIENT_URL="<client-url>" # Example: http://localhost:3000 NO SLASH AT THE END
