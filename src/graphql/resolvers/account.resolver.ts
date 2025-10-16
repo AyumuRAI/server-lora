@@ -233,7 +233,8 @@ export const resolvers = {
         return {
           success: true,
           message: "Login successful",
-          token
+          token,
+          name: account.fname + " " + account.lname
         };
       } catch (err: any) {
         return {
