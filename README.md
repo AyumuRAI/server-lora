@@ -74,6 +74,8 @@ AWS_REGION="ap-southeast-1"
 AWS_ACCESS_KEY_ID="<your-aws-access-key-id>"
 AWS_SECRET_ACCESS_KEY="<your-aws-secret-access-key>"
 AWS_BUCKET_NAME="<your-aws-bucket-name>"
+
+XENDIT_SECRET_KEY="<your-xendit-secret-key-testing>"
 ```
 
 # EXTRAS
