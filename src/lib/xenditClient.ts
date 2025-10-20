@@ -1,7 +1,10 @@
-const Xendit = require("xendit-node") as any;
+import { PaymentRequest } from "xendit-node";
+import dotenv from "dotenv";
 
-const x = new Xendit ({
-  secretKey: process.env.XENDIT_SECRET_KEY
+dotenv.config();
+
+const xenditPaymentRequestClient = new PaymentRequest({
+  secretKey: process.env.XENDIT_SECRET_KEY || " ",
 });
 
-export const { EWallet, VirtualAcc, Card } = x;
+export { xenditPaymentRequestClient };
