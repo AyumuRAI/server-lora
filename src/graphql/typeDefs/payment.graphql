@@ -1,8 +1,13 @@
+type PaymentResponse {
+  success: Boolean
+  message: String
+}
+
 # Main
 type Query {
   _any: String
 }
 
 type Mutation {
-  _any: String
+  createPayment(method: String, amount: Float): PaymentResponse
 }
