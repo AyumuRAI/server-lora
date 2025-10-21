@@ -1,10 +1,13 @@
-import { PaymentRequest } from "xendit-node";
-import dotenv from "dotenv";
+import { PaymentRequest, PaymentMethod } from "xendit-node";
 
-dotenv.config();
+const secretKey = process.env.XENDIT_SECRET_KEY || " ";
 
 const xenditPaymentRequestClient = new PaymentRequest({
-  secretKey: process.env.XENDIT_SECRET_KEY || " ",
+  secretKey
 });
 
-export { xenditPaymentRequestClient };
+const xenditPaymentMethodClient = new PaymentMethod({
+  secretKey
+});
+
+export { xenditPaymentRequestClient, xenditPaymentMethodClient };
