@@ -65,7 +65,8 @@ const startServer = async () => {
   // This is for queries like graphql playground Authorization header
   app.post("/createToken", (req, res) => {
     const temp = {
-      sample: "sample",
+      id: "",
+      role: "USER"
     };
 
     try {
