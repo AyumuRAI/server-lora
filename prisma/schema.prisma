@@ -102,6 +102,7 @@ model Account {
   loans Loans[]
   wallets Wallets[]
   notifications Notifications[]
+  paymentMethods PaymentMethods[]
 }
 
 model Loans {
@@ -224,6 +225,16 @@ model Notifications {
   message String
   createdAt DateTime @default(now())
   isRead Boolean @default(false)
+
+  account Account @relation(fields: [accountId], references: [id], onDelete: Cascade)
+}
+
+model PaymentMethods {
+  id String @id @default(uuid())
+  accountId String
+  paymentMethodId String @unique
+  channelCode String
+  createdAt DateTime @default(now())
 
   account Account @relation(fields: [accountId], references: [id], onDelete: Cascade)
 }
