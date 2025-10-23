@@ -3,11 +3,18 @@ type PaymentResponse {
   message: String
 }
 
+input CardInput {
+  card_number: String
+  exp_month: Int
+  exp_year: Int
+  cvc: String
+}
+
 # Main
 type Query {
   _any: String
 }
 
 type Mutation {
-  createPayment(method: String, amount: Float): PaymentResponse
+  createPayment(method: String, amount: Float, card: CardInput): PaymentResponse
 }
