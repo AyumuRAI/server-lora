@@ -61,7 +61,7 @@ export const resolvers = {
             const response = source.data.data;
             const checkoutUrl = response.attributes.checkout_url;
             const type = "EWALLET";
-            const STATUS= "PENDING";
+            const status = "PENDING";
 
             console.log(response);
           };
@@ -162,7 +162,7 @@ export const resolvers = {
             const response = source.data.data;
             const checkoutUrl = response.attributes.checkout_url;
             const type = "BANK";
-            const STATUS= "PENDING";
+            const status = "PENDING";
 
             console.log(response);
           };
