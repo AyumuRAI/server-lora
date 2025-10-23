@@ -75,8 +75,8 @@ AWS_ACCESS_KEY_ID="<your-aws-access-key-id>"
 AWS_SECRET_ACCESS_KEY="<your-aws-secret-access-key>"
 AWS_BUCKET_NAME="<your-aws-bucket-name>"
 
-PAYMONGO_PUBLIC_KEY=""
-PAYMONGO_SECRET_KEY=""
+PAYMONGO_PUBLIC_KEY="<your-paymongo-pk-key>"
+PAYMONGO_SECRET_KEY="<your-paymongo-sk-key>"
 ```
 
 # EXTRAS
