@@ -1,5 +1,3 @@
-import { PaymentRequestParameters, PaymentRequest } from "xendit-node/payment_request/models";
-import { xenditPaymentRequestClient, xenditPaymentMethodClient } from "@lib/xenditClient";
 import { Context } from "@lib/context";
 import { User } from "@lib/types";
 
@@ -42,65 +40,6 @@ export const resolvers = {
           const selectedMethod = args.method.toUpperCase();
           const paymentAmount = args.amount;
 
-          // EWallet
-          if (EWALLET.includes(selectedMethod)) {
-            const data: PaymentRequestParameters = {
-              "amount" : paymentAmount,
-              "paymentMethod" : {
-                "ewallet" : {
-                  "channelProperties" : {
-                    "successReturnUrl" : "https://google.com",
-                    "failureReturnUrl" : "https://google.com"
-                  },
-                  "channelCode" : selectedMethod as "GCASH" | "PAYMAYA"
-                },
-                "reusability" : "ONE_TIME_USE",
-                "type" : "EWALLET"
-              },
-              "currency" : "PHP",
-              "referenceId" : "example-ref-1234"
-            };
-
-            const response: PaymentRequest = await xenditPaymentRequestClient.createPaymentRequest({
-              data
-            });
-
-            console.log(response);
-          };
-
-          if (BANK.includes(selectedMethod)) {
-            // Check if payment method id exists
-            const paymentMethod = await context.prismaReplica.paymentMethods.findFirst({
-              where: {
-                accountId: user.id,
-                channelCode: selectedMethod
-              }
-            });
-
-            if (!paymentMethod) {
-              return {
-                success: false,
-                message: "Payment method not found"
-              };
-            };
-
-            const data: PaymentRequestParameters = {
-              "amount" : 1500,
-              "metadata" : {
-                "sku" : "example-sku-1234"
-              },
-              "paymentMethodId" : "pm-9685a196-81e9-4c73-8d62-97df5aab2762",
-              "currency" : "PHP",
-              "referenceId" : "example-ref-1234"
-            };
-
-            const response: PaymentRequest = await xenditPaymentRequestClient.createPaymentRequest({
-              data
-            });
-
-            console.log(response);
-          };
-
           return {
             success: true,
             message: "Payment created successfully"
@@ -112,6 +51,6 @@ export const resolvers = {
             message: JSON.stringify(err) // Temporary stringify error
           };
         };
-    }
+    },
   }
 };
