@@ -75,8 +75,30 @@ AWS_ACCESS_KEY_ID="<your-aws-access-key-id>"
 AWS_SECRET_ACCESS_KEY="<your-aws-secret-access-key>"
 AWS_BUCKET_NAME="<your-aws-bucket-name>"
 
-PAYMONGO_PUBLIC_KEY="<your-paymongo-pk-key>"
-PAYMONGO_SECRET_KEY="<your-paymongo-sk-key>"
+PAYMONGO_PUBLIC_KEY="<your-paymongo-pk-test-key>"
+PAYMONGO_SECRET_KEY="<your-paymongo-sk-test-key>"
+```
+
+# NGROK AND PAYMONGO WEBHOOK TO WORK (REQUIRED MUST READ)
+For the PayMongo webhook to work, you need to install NGROK via npm and make sure to follow these steps
+```
+npm install -g ngrok
+```
+
+Once installed globally, ensure that you signup on NGROK to get AUTHTOKEN in the dashboard
+```
+ngrok config add-authtoken <your-auth-token-from-dashboard>
+```
+
+Then you can run NGROK
+```
+ngrok http 5000
+```
+
+After running NGROK, make sure to copy the link provided by the NGROK server and add it to your PayMongo Webhook configuration.
+Go to your PayMongo dashboard, navigate to **Developers > Webhooks > Create Webhook**, and paste the NGROK link there to complete the setup.
+```
+https://<your-ngrok-link>/webhook/paymongo
 ```
 
 # EXTRAS
