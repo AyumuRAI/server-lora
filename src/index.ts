@@ -15,6 +15,7 @@ import { configurePassport } from "./lib/passport";
 
 // Routes
 import OAuthRoute from "./routes/oauth";
+import webhookPaymongo from "./routes/webhookPaymongo";
 
 // Middlewares
 import { contextMiddleware } from "@lib/middleware"
@@ -31,8 +32,15 @@ const server = new ApolloServer({
   introspection: process.env.NODE_ENV !== "production",
 });
 
-const startServer = async () => {
+const startServer = async () => {   
   await server.start();
+  
+  app.use(express.json({ limit: "100mb" }));
+  app.use(
+    cors({
+      origin: "*",
+    })
+  );
 
   // Apply global middleware
   app.use(contextMiddleware);
@@ -42,12 +50,8 @@ const startServer = async () => {
   app.use(passport.initialize());
   app.use("/auth", OAuthRoute);
 
-  app.use(express.json({ limit: "100mb" }));
-  app.use(
-    cors({
-      origin: "*",
-    })
-  );
+  // Paymongo webhook
+  app.use("/", webhookPaymongo);
 
   app.use("/graphql", expressMiddleware(server, {
     context: async ({ req }: { req: any }): Promise<Context> => {

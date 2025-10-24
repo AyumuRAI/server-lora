@@ -72,8 +72,15 @@ type Card = {
   cvc: string;
 }
 
+type BillingInfo = {
+  name: string;
+  email: string;
+  phone: string;
+}
+
 export { 
   CreateAccountData, CreateAccountDataAdmin, 
   LoanApplicationData, SubmittedRequirementData,
-  Requirement, User, CashInMethodType, Card
+  Requirement, User, CashInMethodType, Card,
+  BillingInfo
 };

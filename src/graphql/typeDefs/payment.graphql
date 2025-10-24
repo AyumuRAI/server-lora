@@ -10,11 +10,17 @@ input CardInput {
   cvc: String
 }
 
+input BillingInfoInput {
+  name: String
+  email: String
+  phone: String
+}
+
 # Main
 type Query {
   _any: String
 }
 
 type Mutation {
-  createPayment(method: String, amount: Float, card: CardInput): PaymentResponse
+  createPayment(method: String, amount: Float, card: CardInput, billing: BillingInfoInput): PaymentResponse
 }

@@ -1,5 +1,5 @@
 import { Context } from "@lib/context";
-import { User, Card } from "@lib/types";
+import { User, Card, BillingInfo } from "@lib/types";
 import { paymongo } from "@lib/paymongoClient";
 
 export const resolvers = {
@@ -9,7 +9,7 @@ export const resolvers = {
     }
   },
   Mutation: {
-    createPayment: async (_any: any, args: { method: string, amount: number, card: Card }, context: Context) => {
+    createPayment: async (_any: any, args: { method: string, amount: number, card: Card, billing: BillingInfo }, context: Context) => {
         try {
           // if (!context.user) {
           //   return {
@@ -137,23 +137,30 @@ export const resolvers = {
             const responsePaymentIntentAttach = paymentIntentAttach.data.data;
             const statusAttach = responsePaymentIntentAttach.attributes.status;
 
-            console.log(response);
-            console.log(responsePaymentMethod);
-            console.log(responsePaymentIntentAttach);
+            // console.log(response);
+            // console.log(responsePaymentMethod);
+            // console.log(responsePaymentIntentAttach);
           };
 
           // Banks
           if (BANK.includes(selectedMethod)) {
+            // TO DO: This is not working code at the moment
             const source = await paymongo.post("/sources", {
               data: {
                 attributes: {
-                  type: "grab_pay",
+                  type: selectedMethod,
                   amount: paymentAmount,
                   currency: "PHP",
                   redirect: {
                     // example redirect url only
                     success: "https://google.com",
                     failed: "https://google.com"
+                  },
+                  // Required for banks request
+                  billing: {
+                    name: args.billing.name,
+                    email: args.billing.email,
+                    phone: args.billing.phone
                   }
                 }
               }
