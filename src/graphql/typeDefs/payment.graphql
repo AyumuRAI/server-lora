@@ -1,6 +1,10 @@
+scalar JSON
+
 type PaymentResponse {
   success: Boolean
   message: String
+  nextActionUrls: JSON
+  status: String
 }
 
 input CardInput {
@@ -22,5 +26,5 @@ type Query {
 }
 
 type Mutation {
-  createPayment(method: String, amount: Float, card: CardInput, billing: BillingInfoInput): PaymentResponse
+  createPayment(method: String, amount: Float, card: CardInput, billing: BillingInfoInput, loanId: Int): PaymentResponse
 }
