@@ -1,0 +1,30 @@
+scalar JSON
+
+type PaymentResponse {
+  success: Boolean
+  message: String
+  nextActionUrls: JSON
+  status: String
+}
+
+input CardInput {
+  card_number: String
+  exp_month: Int
+  exp_year: Int
+  cvc: String
+}
+
+input BillingInfoInput {
+  name: String
+  email: String
+  phone: String
+}
+
+# Main
+type Query {
+  _any: String
+}
+
+type Mutation {
+  createPayment(method: String, amount: Float, card: CardInput, billing: BillingInfoInput, loanId: Int): PaymentResponse
+}

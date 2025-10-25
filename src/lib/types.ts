@@ -65,8 +65,22 @@ type User = {
 
 type CashInMethodType = "GCASH" | "OVER_THE_COUNTER" | "PAYMAYA" | "CREDIT_CARD" | "DEBIT_CARD";
 
+type Card = {
+  card_number: string;
+  exp_month: number;
+  exp_year: number;
+  cvc: string;
+}
+
+type BillingInfo = {
+  name: string;
+  email: string;
+  phone: string;
+}
+
 export { 
   CreateAccountData, CreateAccountDataAdmin, 
   LoanApplicationData, SubmittedRequirementData,
-  Requirement, User, CashInMethodType
+  Requirement, User, CashInMethodType, Card,
+  BillingInfo
 };
