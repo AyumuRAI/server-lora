@@ -37,6 +37,23 @@ input CreateAccountAdminInput {
   role: Roles
 }
 
+input UpdateProfileInput {
+  fname: String
+  mname: String
+  lname: String
+  suffix: String
+  birthdate: String
+  gender: String
+  nationality: String
+  country: String
+  province: String
+  municipality: String
+  barangay: String
+  address_text: String
+  email: String
+  profileImage: String
+}
+
 type ResponseAccount {
   success: Boolean
   message: String
@@ -78,6 +95,12 @@ type ResponseLoginAccount {
   name: String
 }
 
+type UpdateProfileResponse {
+  success: Boolean
+  message: String
+  account: JSON
+}
+
 # Main
 type Query {
   sendMPIN(phone: String): ResponseMPIN
@@ -94,4 +117,5 @@ type Mutation {
   loginAccountWeb(email: String, password: String): ResponseAccount
   updateNotifications(notifId: Int): ResponseUpdateNotifications
   forgetPasswordMobile(newPassword: String): ResponseForgetPassword
+  updateProfile(data: UpdateProfileInput): UpdateProfileResponse
 }

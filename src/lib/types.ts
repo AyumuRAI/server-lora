@@ -63,7 +63,7 @@ type User = {
   phoneNumber?: string;
 }
 
-type CashInMethodType = "GCASH" | "OVER_THE_COUNTER" | "PAYMAYA" | "CREDIT_CARD" | "DEBIT_CARD";
+type CashInMethodType = "GCASH" | "OVER_THE_COUNTER" | "PAYMAYA" | "CREDIT_CARD" | "DEBIT_CARD" | "LORA_WALLET";
 
 type Card = {
   card_number: string;

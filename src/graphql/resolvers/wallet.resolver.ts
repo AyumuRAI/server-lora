@@ -2,6 +2,7 @@ import { Context } from "@lib/context";
 import { User, CashInMethodType } from "@lib/types";
 import { format } from "date-fns";
 import { GraphQLJSON } from "graphql-type-json"
+import { randomUUID } from "crypto";
 
 export const resolvers = {
   // Apply custom scalar
@@ -61,14 +62,53 @@ export const resolvers = {
           }
         });
 
+        const counterpartyIds = Array.from(
+          new Set(
+            (transactions?.transactions || [])
+              .map((transaction) => transaction.recipientAccountId)
+              .filter((id): id is string => Boolean(id))
+          )
+        );
+
+        let counterpartyMap: Record<string, { name: string; phone?: string | null }> = {};
+
+        if (counterpartyIds.length > 0) {
+          const counterparties = await context.prismaReplica.account.findMany({
+            where: {
+              id: {
+                in: counterpartyIds
+              }
+            },
+            select: {
+              id: true,
+              fname: true,
+              lname: true,
+              phone: true
+            }
+          });
+
+          counterpartyMap = counterparties.reduce<Record<string, { name: string; phone?: string | null }>>((acc, account) => {
+            acc[account.id] = {
+              name: `${account.fname} ${account.lname}`.trim(),
+              phone: account.phone
+            };
+            return acc;
+          }, {});
+        }
+
         const formattedWalletTransactions = transactions?.transactions.map((transaction) => {
+          const counterparty = transaction.recipientAccountId ? counterpartyMap[transaction.recipientAccountId] : undefined;
           return {
             id: transaction.id,
-            type: transaction.type.replace("_", " "),
-            amount: transaction.amount,
+            type: transaction.type.replace(/_/g, " "),
+            amount: parseFloat(transaction.amount.toString()),
             source: transaction.method,
             date: format(transaction.createdAt, "MMMM, dd hh:mm a"),
-            status: "Completed"
+            status: "Completed",
+            note: transaction.note,
+            referenceNumber: transaction.referenceNumber,
+            counterparty: counterparty?.name,
+            counterpartyPhone: counterparty?.phone
           }
         });
 
@@ -112,7 +152,8 @@ export const resolvers = {
                   {
                     type: "CASH_IN",
                     amount: args.amount,
-                    method: args.method
+                    method: args.method,
+                    referenceNumber: randomUUID()
                   }
                 ]
               }
@@ -247,6 +288,181 @@ export const resolvers = {
           message: "Wallet payment successful",
           transactionId: prismaTransaction.id,
           referenceNumber: prismaTransaction.referenceNumber
+        };
+      } catch (err: any) {
+        return {
+          success: false,
+          message: err.message
+        };
+      }
+    },
+    walletTransfer: async (_: any, args: { recipientPhone: string; amount: number; method?: string | null; note?: string | null }, context: Context) => {
+      try {
+        if (!context.user) {
+          return {
+            success: false,
+            message: "Unauthorized"
+          };
+        }
+
+        const { recipientPhone, amount, method, note } = args;
+
+        if (!recipientPhone || amount === undefined) {
+          return {
+            success: false,
+            message: "Recipient phone and amount are required"
+          };
+        }
+
+        if (amount <= 0) {
+          return {
+            success: false,
+            message: "Amount must be greater than zero"
+          };
+        }
+
+        const user = context.user as User;
+        const sanitizedPhone = recipientPhone.replace(/\s+/g, "");
+        const normalizedPhilippinesPhone = sanitizedPhone.startsWith("+")
+          ? sanitizedPhone
+          : sanitizedPhone.startsWith("0")
+            ? `+63${sanitizedPhone.substring(1)}`
+            : `+63${sanitizedPhone}`;
+
+        const senderAccount = await context.prismaReplica.account.findUnique({
+          where: {
+            id: user.id
+          },
+          include: {
+            wallets: true
+          }
+        });
+
+        if (!senderAccount || senderAccount.wallets.length === 0) {
+          return {
+            success: false,
+            message: "Sender wallet not found"
+          };
+        }
+
+        const recipientAccount = await context.prismaReplica.account.findFirst({
+          where: {
+            OR: [
+              { phone: sanitizedPhone },
+              { phone: normalizedPhilippinesPhone }
+            ]
+          },
+          include: {
+            wallets: true
+          }
+        });
+
+        if (!recipientAccount || recipientAccount.wallets.length === 0) {
+          return {
+            success: false,
+            message: "Recipient not found"
+          };
+        }
+
+        if (recipientAccount.id === senderAccount.id) {
+          return {
+            success: false,
+            message: "You cannot transfer to your own account"
+          };
+        }
+
+        const senderWallet = senderAccount.wallets[0];
+        const recipientWallet = recipientAccount.wallets[0];
+        const senderBalance = parseFloat(senderWallet.balance.toString());
+
+        if (senderBalance < amount) {
+          return {
+            success: false,
+            message: "Insufficient wallet balance"
+          };
+        }
+
+        const allowedMethods = ["GCASH", "PAYMAYA", "DEBIT_CARD", "CREDIT_CARD", "OVER_THE_COUNTER", "LORA_WALLET"];
+        const resolvedMethod = method && allowedMethods.includes(method.toUpperCase())
+          ? method.toUpperCase()
+          : "LORA_WALLET";
+
+        const referenceNumber = randomUUID();
+        const pesoFormatter = new Intl.NumberFormat("en-PH", {
+          style: "currency",
+          currency: "PHP"
+        });
+
+        const senderTransaction = await context.prisma.$transaction(async (tx) => {
+          await tx.wallets.update({
+            where: {
+              id: senderWallet.id
+            },
+            data: {
+              balance: {
+                decrement: amount
+              }
+            }
+          });
+
+          await tx.wallets.update({
+            where: {
+              id: recipientWallet.id
+            },
+            data: {
+              balance: {
+                increment: amount
+              }
+            }
+          });
+
+          const debit = await tx.walletTransactions.create({
+            data: {
+              walletId: senderWallet.id,
+              type: "TRANSFER_OUT",
+              amount,
+              method: resolvedMethod as CashInMethodType,
+              note: note || null,
+              recipientAccountId: recipientAccount.id,
+              referenceNumber
+            }
+          });
+
+          await tx.walletTransactions.create({
+            data: {
+              walletId: recipientWallet.id,
+              type: "TRANSFER_IN",
+              amount,
+              method: resolvedMethod as CashInMethodType,
+              note: note || null,
+              recipientAccountId: senderAccount.id,
+              referenceNumber
+            }
+          });
+
+          await tx.notifications.createMany({
+            data: [
+              {
+                accountId: senderAccount.id,
+                title: "Transfer Sent",
+                message: `You sent ${pesoFormatter.format(amount)} to ${recipientAccount.fname} ${recipientAccount.lname}`
+              },
+              {
+                accountId: recipientAccount.id,
+                title: "Transfer Received",
+                message: `You received ${pesoFormatter.format(amount)} from ${senderAccount.fname} ${senderAccount.lname}`
+              }
+            ]
+          });
+
+          return debit;
+        });
+
+        return {
+          success: true,
+          message: "Transfer completed successfully",
+          transactionId: senderTransaction.id,
+          referenceNumber
         };
       } catch (err: any) {
         return {

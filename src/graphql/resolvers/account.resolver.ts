@@ -390,6 +390,109 @@ export const resolvers = {
           message: err.message
         }
       };
+    },
+    updateProfile: async (_: any, args: { data?: Record<string, any> }, context: Context) => {
+      try {
+        if (!context.user) {
+          return {
+            success: false,
+            message: "Unauthorized"
+          };
+        }
+
+        if (!args.data || Object.keys(args.data).length === 0) {
+          return {
+            success: false,
+            message: "No profile data provided"
+          };
+        }
+
+        const user = context.user as User;
+
+        const payload = args.data;
+        const updateData: Record<string, any> = {};
+
+        const assignIfPresent = (key: string, transformer?: (value: string) => any) => {
+          const value = payload[key];
+          if (value === undefined || value === null || value === "") {
+            return;
+          }
+          updateData[key] = transformer ? transformer(value) : value;
+        };
+
+        assignIfPresent("fname", (val) => val.trim());
+        assignIfPresent("mname", (val) => val.trim());
+        assignIfPresent("lname", (val) => val.trim());
+        assignIfPresent("suffix", (val) => val.trim());
+        assignIfPresent("gender");
+        assignIfPresent("nationality", (val) => val.trim());
+        assignIfPresent("country", (val) => val.trim());
+        assignIfPresent("province", (val) => val.trim());
+        assignIfPresent("municipality", (val) => val.trim());
+        assignIfPresent("barangay", (val) => val.trim());
+        assignIfPresent("address_text", (val) => val.trim());
+        assignIfPresent("profileImage");
+
+        if (payload.birthdate) {
+          const birthdate = new Date(payload.birthdate);
+          if (Number.isNaN(birthdate.getTime())) {
+            return {
+              success: false,
+              message: "Invalid birthdate format"
+            };
+          }
+          updateData.birthdate = birthdate;
+        }
+
+        if (payload.email) {
+          const normalizedEmail = payload.email.trim().toLowerCase();
+          const emailExists = await context.prismaReplica.account.findFirst({
+            where: {
+              email: normalizedEmail,
+              NOT: {
+                id: user.id
+              }
+            },
+            select: { id: true }
+          });
+
+          if (emailExists) {
+            return {
+              success: false,
+              message: "Email is already in use"
+            };
+          }
+
+          updateData.email = normalizedEmail;
+        }
+
+        if (Object.keys(updateData).length === 0) {
+          return {
+            success: false,
+            message: "No valid fields provided for update"
+          };
+        }
+
+        const updatedAccount = await context.prisma.account.update({
+          where: {
+            id: user.id
+          },
+          data: updateData
+        });
+
+        const { pinCode, password, ...filtered } = updatedAccount;
+
+        return {
+          success: true,
+          message: "Profile updated successfully",
+          account: filtered
+        };
+      } catch (err: any) {
+        return {
+          success: false,
+          message: err.message
+        }
+      }
     }
   },
 };
